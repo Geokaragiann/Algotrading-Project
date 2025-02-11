@@ -16,20 +16,35 @@
 """Functions"""
 
 def get_price(ticker):
-    url = f"https://api.binance.com/api/v3/ticker/price?symbol={ticker}"
+    url = f"https://api.binance.com/api/v3/ticker/bookTicker?symbol={ticker.upper()}USDT"
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
-        return float(data['price'])
+        bid_price = float(data['bidPrice'])
+        ask_price = float(data['askPrice'])
+        return bid_price, ask_price, response.status_code
+    
     else:
         print(f"Failed to retrieve data: {response.status_code}")
+        return None, None, response.status_code
 
 
 """Main"""
 import time
 import requests
+import config
+
+"""
+API_KEY = 'your_test_api_key'
+API_SECRET = 'your_test_api_secret'
+"""
+
 ticker = input("Input Ticker: ").upper()
 while True:
-    price = get_price(ticker)
-    print(price)
-    time.sleep(1)
+    bid_price, ask_price, status = get_price(ticker)
+    if status == 400:
+        break
+    print(f"Bid: {bid_price} | Ask: {ask_price}")
+    time.sleep(0.5)
+
+    
