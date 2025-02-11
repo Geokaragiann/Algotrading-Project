@@ -13,5 +13,23 @@
 # You should have received a copy of the GNU Affero General Public License  
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-print("Hello World!")
+"""Functions"""
 
+def get_price(ticker):
+    url = f"https://api.binance.com/api/v3/ticker/price?symbol={ticker}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        return float(data['price'])
+    else:
+        print(f"Failed to retrieve data: {response.status_code}")
+
+
+"""Main"""
+import time
+import requests
+ticker = input("Input Ticker: ").upper()
+while True:
+    price = get_price(ticker)
+    print(price)
+    time.sleep(1)
