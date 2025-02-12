@@ -45,4 +45,9 @@ while True:
     if status == 400:
         break
     print(f"Bid: {bid_price} | Ask: {ask_price}")
-    time.sleep(1)
+    time.sleep(2)
+    
+"""test test test"""
+
+"""test test"""
+
