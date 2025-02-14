@@ -32,7 +32,7 @@ def get_price(ticker):
 """Main"""
 import time
 import requests
-import config
+import config #file containing the API keys for executing trades, in the following way  vvvvvvvv
 
 """
 API_KEY = 'your_test_api_key'
@@ -45,6 +45,6 @@ while True:
     if status == 400:
         break
     print(f"Bid: {bid_price} | Ask: {ask_price}")
-    time.sleep(0.5)
+    time.sleep(1)
 
     
