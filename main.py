@@ -39,12 +39,17 @@ API_KEY = 'your_test_api_key'
 API_SECRET = 'your_test_api_secret'
 """
 
-ticker = input("Input Ticker: ").upper()
+ticker = input("Input Ticker: ")
 while True:
     bid_price, ask_price, status = get_price(ticker)
     if status == 400:
         break
     print(f"Bid: {bid_price} | Ask: {ask_price}")
     time.sleep(1)
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/main
     
+
+
