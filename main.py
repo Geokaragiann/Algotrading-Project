@@ -16,17 +16,16 @@
 """Functions"""
 # This function requests the live bid and ask price and returns them. It also returns the status code (error or success)
 def get_price(ticker):
-    url = f"https://testnet.binance.vision/api/v3/ticker/bookTicker?symbol={ticker.upper()}USDT"
-    response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        bid_price = float(data['bidPrice'])
-        ask_price = float(data['askPrice'])
-        return bid_price, ask_price, response.status_code
-    
-    else:
-        print(f"Failed to retrieve data: {response.status_code}")
-        return None, None, response.status_code
+    try:
+        symbol = f"{ticker.upper()}USDT"
+        ticker_price = client.get_symbol_ticker(symbol=symbol)
+        book_ticker = client.get_order_book(symbol=symbol)
+        bid_price = float(book_ticker['bids'][0][0])
+        ask_price = float(book_ticker['asks'][0][0])
+        return bid_price, ask_price, 200
+    except Exception as e:
+        print(f"Failed to retrieve data: {str(e)}")
+        return None, None, 400
 
 
 # This function makes sure requests the minimum USD amount allowed for orders
@@ -56,7 +55,7 @@ def buy_order(ticker):
         return
     
     try:
-        order = client.order_market_buy(symbol=symbol, quantity=quantity,test=True)
+        order = client.order_market_buy(symbol=symbol, quantity=quantity)
         print(f"Buy order done: {order}")
     except Exception as e:
         print(f"Order failed: {str(e)}")
@@ -80,7 +79,7 @@ def sell_order(ticker):
         return
     
     try:
-        order = client.order_market_sell(symbol=symbol, quantity=quantity,test=True)
+        order = client.order_market_sell(symbol=symbol, quantity=quantity)
         print(f"Sell order done: {order}")
     except Exception as e:
         print(f"Order failed: {str(e)}")
@@ -118,14 +117,15 @@ def cancel_open_orders(ticker):
             return
         
         for order in open_orders:
-            result = client.cancel_order(symbol=symbol, orderId=order['orderId'], test=True)
+            result = client.cancel_order(symbol=symbol, orderId=order['orderId'],
+)
             print(f"Cancelled order: {result}")
         print("All open orders cancelled")
     except Exception as e:
         print(f"Error cancelling orders: {str(e)}")
 
 """Main"""
-import time, math, requests, config #file containing the API keys
+import time, math, config #file containing the API keys
 from binance.client import Client
 
 """
