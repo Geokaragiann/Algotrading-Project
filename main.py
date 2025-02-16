@@ -14,7 +14,7 @@
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """Functions"""
-
+# This function requests the live bid and ask price and returns them. It also returns the status code (error or success)
 def get_price(ticker):
     url = f"https://testnet.binance.vision/api/v3/ticker/bookTicker?symbol={ticker.upper()}USDT"
     response = requests.get(url)
@@ -28,161 +28,101 @@ def get_price(ticker):
         print(f"Failed to retrieve data: {response.status_code}")
         return None, None, response.status_code
 
-def get_user_inputs():
-    return {
-        'ticker': input("Input Ticker: "),
-        'pos_size': input("Input position size (in $): "),
-        'take_profit': input("Input take profit (in %): "),
-        'stop_loss': input("Input stop loss (in %): ")
-    }
 
-def execute_trade(inputs):
-    client = Client(config.API_KEY, config.API_SECRET, testnet=True)
+# This function makes sure requests the minimum USD amount allowed for orders
+def get_min_notional(ticker):
+    exchange_info = client.get_symbol_info(f"{ticker.upper()}USDT")
+    for filter in exchange_info['filters']:
+        if filter['filterType'] == 'MIN_NOTIONAL':
+            return float(filter['minNotional'])
+    return 10  # default minimum notional in USDT
 
-    try:
-        # Get current price to calculate quantity
-        ticker_price = float(client.get_symbol_ticker(symbol=f"{inputs['ticker'].upper()}USDT")['price'])
-        quantity = float(inputs['pos_size']) / ticker_price
-        
-        # Get symbol info and find the LOT_SIZE filter
-        info = client.get_symbol_info(f"{inputs['ticker'].upper()}USDT")
-        lot_size_filter = next(filter(lambda x: x['filterType'] == 'LOT_SIZE', info['filters']))
-        price_filter = next(filter(lambda x: x['filterType'] == 'PRICE_FILTER', info['filters']))
-        
-        # Round quantity according to LOT_SIZE
-        quantity = round_step_size(quantity, lot_size_filter['stepSize'])
-        
-        print(f"\nCalculated quantity: {quantity}")  # Debug print
-        
-        # Place market buy order
-        order = client.create_order(
-            symbol=f"{inputs['ticker'].upper()}USDT",
-            side='BUY',
-            type='MARKET',
-            quantity=quantity
-        )
-        
-        # Get fill price from the order
-        fill_price = float(order['fills'][0]['price'])
-        
-        # Calculate and round take profit and stop loss prices
-        tp_price = round_step_size(fill_price * (1 + float(inputs['take_profit'])/100), price_filter['tickSize'])
-        sl_price = round_step_size(fill_price * (1 - float(inputs['stop_loss'])/100), price_filter['tickSize'])
-        
-        # Place take profit sell order
-        tp_order = client.create_order(
-            symbol=f"{inputs['ticker'].upper()}USDT",
-            side='SELL',
-            type='LIMIT',
-            timeInForce='GTC',
-            quantity=quantity,
-            price=tp_price
-        )
-        
-        # Place stop loss order
-        sl_order = client.create_order(
-            symbol=f"{inputs['ticker'].upper()}USDT",
-            side='SELL',
-            type='STOP_LOSS_LIMIT',
-            timeInForce='GTC',
-            quantity=quantity,
-            price=sl_price,
-            stopPrice=sl_price
-        )
-        
-        print(f"\nOrders placed successfully:")
-        print(f"Entry Price: ${fill_price:.4f}")
-        print(f"Take Profit: ${tp_price:.4f}")
-        print(f"Stop Loss: ${sl_price:.4f}")
-        
-        # Show current orders
-        open_orders = client.get_open_orders(symbol=f"{inputs['ticker'].upper()}USDT")
-        print("\nCurrent Open Orders:")
-        for order in open_orders:
-            print(f"Order ID: {order['orderId']}")
-            print(f"Type: {order['type']}")
-            print(f"Side: {order['side']}")
-            print(f"Price: ${float(order['price']):.4f}")
-            print(f"Quantity: {float(order['origQty']):.8f}")
-            print("------------------------")
-        
-    except Exception as e:
-        print(f"\n❌ An error occurred: {str(e)}")
-        print("Error details:", type(e).__name__)
-        if hasattr(e, 'code') and hasattr(e, 'message'):
-            print(f"Code: {e.code}")
-            print(f"Message: {e.message}")
-
-def round_step_size(quantity, step_size):
-    precision = int(round(-math.log10(float(step_size))))
-    return round(quantity, precision)
-
-def check_orders(ticker):
-    client = Client(config.API_KEY, config.API_SECRET, testnet=True)
+# This function asks for quantity and executes buy orders
+def buy_order(ticker):
+    quantity = input("Input quantity: ")
+    symbol = f"{ticker.strip().upper()}USDT"
+    # Get current price
+    bid_price, ask_price, _ = get_price(ticker)
+    if bid_price is None:
+        print("Could not get current price")
+        return
     
-    open_orders = client.get_open_orders(symbol=f"{ticker.upper()}USDT")
-    print(f"\n=== Current Open Orders for {ticker.upper()} ===")
+    # Check minimum notional
+    order_value = float(quantity) * ask_price
+    min_notional = get_min_notional(ticker)
     
-    if not open_orders:
-        print("No open orders found.")
-    else:
-        for order in open_orders:
-            print("\n📊 Order Details:")
-            print(f"Type: {'🛑 Stop Loss' if order['type'] == 'STOP_LOSS_LIMIT' else '🎯 Take Profit' if order['type'] == 'LIMIT' else order['type']}")
-            print(f"Side: {'🔴 SELL' if order['side'] == 'SELL' else '🟢 BUY'}")
-            print(f"Price: ${float(order['price']):.4f}")
-            print(f"Quantity: {float(order['origQty']):.8f} {ticker.upper()}")
-            if order['type'] == 'STOP_LOSS_LIMIT':
-                print(f"Stop Trigger: ${float(order['stopPrice']):.4f}")
-            print("------------------------")
-    
-    # Get current balance
-    balance = client.get_asset_balance(asset=ticker.upper())
-    print(f"\n💰 Current {ticker.upper()} Balance:")
-    print(f"Available: {float(balance['free']):.8f}")
-    print(f"In Orders: {float(balance['locked']):.8f}")
-    
-    # Get current market price
-    current_price = float(client.get_symbol_ticker(symbol=f"{ticker.upper()}USDT")['price'])
-    print(f"\n📈 Current Market Price: ${current_price:.4f}")
-
-def close_position(ticker):
-    client = Client(config.API_KEY, config.API_SECRET, testnet=True)
-    symbol = f"{ticker.upper()}USDT"
+    if order_value < min_notional:
+        print(f"Order value ({order_value:.2f} USDT) is less than minimum required ({min_notional} USDT)")
+        return
     
     try:
-        # First cancel all open orders
-        result = client.cancel_all_open_orders(symbol=symbol)
-        print("\n🚫 Cancelled all open orders")
-        
-        # Get current balance
-        balance = client.get_asset_balance(asset=ticker.upper())
-        quantity = float(balance['free'])
-        
-        if quantity > 0:
-            # Get symbol info for LOT_SIZE filter
-            info = client.get_symbol_info(symbol)
-            lot_size_filter = next(filter(lambda x: x['filterType'] == 'LOT_SIZE', info['filters']))
-            # Round quantity according to LOT_SIZE
-            quantity = round_step_size(quantity, lot_size_filter['stepSize'])
-            
-            # Place market sell order for entire balance
-            order = client.create_order(
-                symbol=symbol,
-                side='SELL',
-                type='MARKET',
-                quantity=quantity
-            )
-            print(f"✅ Sold {quantity} {ticker.upper()} at market price")
-        else:
-            print(f"No {ticker.upper()} balance to sell")
-            
-        # Show final balance
-        final_balance = client.get_asset_balance(asset=ticker.upper())
-        print(f"\n💰 Final {ticker.upper()} Balance: {float(final_balance['free']):.8f}")
-        
+        order = client.order_market_buy(symbol=symbol, quantity=quantity,test=True)
+        print(f"Buy order done: {order}")
     except Exception as e:
-        print(f"❌ An error occurred: {str(e)}")
+        print(f"Order failed: {str(e)}")
+
+# This function asks for quantity and executes sell orders
+def sell_order(ticker):
+    quantity = input("Input quantity: ")
+    symbol = f"{ticker.strip().upper()}USDT"
+    # Get current price
+    bid_price, ask_price, _ = get_price(ticker)
+    if bid_price is None:
+        print("Could not get current price")
+        return
+    
+    # Check minimum notional
+    order_value = float(quantity) * bid_price
+    min_notional = get_min_notional(ticker)
+    
+    if order_value < min_notional:
+        print(f"Order value ({order_value:.2f} USDT) is less than minimum required ({min_notional} USDT)")
+        return
+    
+    try:
+        order = client.order_market_sell(symbol=symbol, quantity=quantity,test=True)
+        print(f"Sell order done: {order}")
+    except Exception as e:
+        print(f"Order failed: {str(e)}")
+
+
+# This function outputs available quantity and quantity locked in orders, for both USDT and the Selected Asset.
+def get_current_positions(ticker):
+    try:
+        account = client.get_account()
+        ticker_free = 0.0
+        ticker_locked = 0.0
+        usdt_free = 0.0
+        usdt_locked = 0.0
+        
+        for balance in account['balances']:
+            if balance['asset'] == ticker.upper():
+                ticker_free = float(balance['free'])
+                ticker_locked = float(balance['locked'])
+            elif balance['asset'] == 'USDT':
+                usdt_free = float(balance['free'])
+                usdt_locked = float(balance['locked'])
+                
+        return ticker_free, ticker_locked, usdt_free, usdt_locked
+    except Exception as e:
+        print(f"Error getting positions: {str(e)}")
+        return 0.0, 0.0, 0.0, 0.0
+
+# This function cancels all open orders
+def cancel_open_orders(ticker):
+    symbol = f"{ticker.strip().upper()}USDT"
+    try:
+        open_orders = client.get_open_orders(symbol=symbol)
+        if not open_orders:
+            print("No open orders to cancel")
+            return
+        
+        for order in open_orders:
+            result = client.cancel_order(symbol=symbol, orderId=order['orderId'], test=True)
+            print(f"Cancelled order: {result}")
+        print("All open orders cancelled")
+    except Exception as e:
+        print(f"Error cancelling orders: {str(e)}")
 
 """Main"""
 import time, math, requests, config #file containing the API keys
@@ -192,48 +132,31 @@ from binance.client import Client
 API_KEY = 'your_test_api_key'
 API_SECRET = 'your_test_api_secret'
 """
+client = Client(config.API_KEY,config.API_SECRET, testnet=True)
+ticker = input("Input ticker: ")
 
-while True:
-    print("\n=== Trading Menu ===")
-    print("1. 📈 Execute new trade")
-    print("2. 📊 Check existing orders")
-    print("3. 📉 Close position")
-    print("4. 🚪 Exit")
+bid, ask, status = get_price(ticker)
+print(f"Bid: {bid} | Ask: {ask}")
+ans = 0
+while ans!="1" and ans!="2":      
+    ticker_free, ticker_locked, usdt_free, usdt_locked = get_current_positions(ticker)
+    bid, ask, _ = get_price(ticker)
     
-    choice = input("\nEnter your choice (1-4): ")
+    print(f"\nCurrent positions:")
+    print(f"{ticker.upper()} Available: {ticker_free:.8f} (${ticker_free * bid:.2f})")
+    print(f"{ticker.upper()} Locked in orders: {ticker_locked:.8f} (${ticker_locked * bid:.2f})")
+    print(f"USDT Available: ${usdt_free:.2f}")
+    print(f"USDT Locked in orders: ${usdt_locked:.2f}\n")
     
-    if choice == "1":
-        inputs = get_user_inputs()
-        while True:
-            ans = input("\nStart trade? (y/N): ")
-            
-            if ans.lower() == 'y':
-                execute_trade(inputs)
-                break
-            elif ans.lower() == 'n' or ans == '':
-                break
-            else:
-                print("Invalid input. Please enter 'y', 'N', or nothing.")
-    
-    elif choice == "2":
-        ticker = input("\nEnter ticker to check (e.g., BTC): ")
-        check_orders(ticker)
-    
-    elif choice == "3":
-        ticker = input("\nEnter ticker to close position (e.g., BTC): ")
-        print(f"\n⚠️ This will cancel all open orders and sell all {ticker.upper()}")
-        confirm = input("Are you sure? (y/N): ")
-        if confirm.lower() == 'y':
-            close_position(ticker)
-        else:
-            print("Position close cancelled")
-    
-    elif choice == "4":
-        print("\nExiting program... Goodbye! 👋")
-        break
-    
+    ans = input("1 - Buy Order\n2 - Sell Order\n3 - Cancel Open Orders\n")
+    if ans == "1":
+        buy_order(ticker)
+    elif ans == "2":
+        sell_order(ticker)
+    elif ans == "3":
+        cancel_open_orders(ticker)
     else:
-        print("\n❌ Invalid choice. Please enter 1, 2, 3, or 4.")
+        print("Enter 1, 2, or 3")
 
 
 
