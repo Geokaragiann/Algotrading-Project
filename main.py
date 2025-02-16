@@ -12,152 +12,202 @@
 
 # You should have received a copy of the GNU Affero General Public License  
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
-
 """Functions"""
-# This function requests the live bid and ask price and returns them. It also returns the status code (error or success)
+from binance.um_futures import UMFutures
+import math
+
 def get_price(ticker):
     try:
         symbol = f"{ticker.upper()}USDT"
-        ticker_price = client.get_symbol_ticker(symbol=symbol)
-        book_ticker = client.get_order_book(symbol=symbol)
-        bid_price = float(book_ticker['bids'][0][0])
-        ask_price = float(book_ticker['asks'][0][0])
+        ticker_price = client.book_ticker(symbol=symbol)
+        bid_price = float(ticker_price['bidPrice'])
+        ask_price = float(ticker_price['askPrice'])
         return bid_price, ask_price, 200
     except Exception as e:
         print(f"Failed to retrieve data: {str(e)}")
         return None, None, 400
 
+def get_quantity_precision(ticker):
+    try:
+        symbol = f"{ticker.upper()}USDT"
+        exchange_info = client.exchange_info()
+        for sym in exchange_info['symbols']:
+            if sym['symbol'] == symbol:
+                for filt in sym['filters']:
+                    if filt['filterType'] == 'LOT_SIZE':
+                        return int(round(-math.log10(float(filt['stepSize']))))
+        return 4  # default precision
+    except Exception as e:
+        print(f"Error getting precision: {str(e)}")
+        return 4
 
-# This function makes sure requests the minimum USD amount allowed for orders
 def get_min_notional(ticker):
-    exchange_info = client.get_symbol_info(f"{ticker.upper()}USDT")
-    for filter in exchange_info['filters']:
-        if filter['filterType'] == 'MIN_NOTIONAL':
-            return float(filter['minNotional'])
-    return 10  # default minimum notional in USDT
+    try:
+        symbol = f"{ticker.upper()}USDT"
+        exchange_info = client.exchange_info()
+        for sym in exchange_info['symbols']:
+            if sym['symbol'] == symbol:
+                for filt in sym['filters']:
+                    if filt['filterType'] == 'MIN_NOTIONAL':
+                        return float(filt['notional'])
+        return 5.0  # default minimum notional
+    except Exception as e:
+        print(f"Error getting min notional: {str(e)}")
+        return 5.0
 
-# This function asks for quantity and executes buy orders
 def buy_order(ticker):
-    quantity = input("Input quantity: ")
-    symbol = f"{ticker.strip().upper()}USDT"
-    # Get current price
-    bid_price, ask_price, _ = get_price(ticker)
-    if bid_price is None:
-        print("Could not get current price")
-        return
-    
-    # Check minimum notional
-    order_value = float(quantity) * ask_price
-    min_notional = get_min_notional(ticker)
-    
-    if order_value < min_notional:
-        print(f"Order value ({order_value:.2f} USDT) is less than minimum required ({min_notional} USDT)")
-        return
-    
     try:
-        order = client.order_market_buy(symbol=symbol, quantity=quantity)
-        print(f"Buy order done: {order}")
+        symbol = f"{ticker.strip().upper()}USDT"
+        bid_price, ask_price, _ = get_price(ticker)
+        if bid_price is None:
+            return
+
+        qty_precision = get_quantity_precision(ticker)
+        quantity = input(f"Input quantity (precision {qty_precision}): ")
+        
+        # Validate quantity format
+        try:
+            quantity = float(quantity)
+            quantity = round(quantity, qty_precision)
+        except ValueError:
+            print("Invalid quantity format")
+            return
+
+        order_value = quantity * ask_price
+        min_notional = get_min_notional(ticker)
+        
+        if order_value < min_notional:
+            print(f"Order value ({order_value:.2f} USDT) < min ({min_notional} USDT)")
+            return
+
+        # Send futures order
+        order = client.new_order(
+            symbol=symbol,
+            side='BUY',
+            type='MARKET',
+            quantity=quantity
+        )
+        print(f"Long position opened: {order}")
     except Exception as e:
         print(f"Order failed: {str(e)}")
 
-# This function asks for quantity and executes sell orders
 def sell_order(ticker):
-    quantity = input("Input quantity: ")
-    symbol = f"{ticker.strip().upper()}USDT"
-    # Get current price
-    bid_price, ask_price, _ = get_price(ticker)
-    if bid_price is None:
-        print("Could not get current price")
-        return
-    
-    # Check minimum notional
-    order_value = float(quantity) * bid_price
-    min_notional = get_min_notional(ticker)
-    
-    if order_value < min_notional:
-        print(f"Order value ({order_value:.2f} USDT) is less than minimum required ({min_notional} USDT)")
-        return
-    
     try:
-        order = client.order_market_sell(symbol=symbol, quantity=quantity)
-        print(f"Sell order done: {order}")
+        symbol = f"{ticker.strip().upper()}USDT"
+        bid_price, ask_price, _ = get_price(ticker)
+        if bid_price is None:
+            return
+
+        qty_precision = get_quantity_precision(ticker)
+        quantity = input(f"Input quantity (precision {qty_precision}): ")
+        
+        try:
+            quantity = float(quantity)
+            quantity = round(quantity, qty_precision)
+        except ValueError:
+            print("Invalid quantity format")
+            return
+
+        order_value = quantity * bid_price
+        min_notional = get_min_notional(ticker)
+        
+        if order_value < min_notional:
+            print(f"Order value ({order_value:.2f} USDT) < min ({min_notional} USDT)")
+            return
+
+        order = client.new_order(
+            symbol=symbol,
+            side='SELL',
+            type='MARKET',
+            quantity=quantity
+        )
+        print(f"Position closed: {order}")
     except Exception as e:
         print(f"Order failed: {str(e)}")
 
-
-# This function outputs available quantity and quantity locked in orders, for both USDT and the Selected Asset.
 def get_current_positions(ticker):
     try:
-        account = client.get_account()
+        account_info = client.account()
+        positions = account_info['positions']
+        symbol = f"{ticker.upper()}USDT"
+        
         ticker_free = 0.0
         ticker_locked = 0.0
-        usdt_free = 0.0
+        usdt_free = float(account_info['availableBalance'])
         usdt_locked = 0.0
+
+        for position in positions:
+            if position['symbol'] == symbol:
+                ticker_free = float(position['positionAmt'])
+                ticker_locked = (float(position['initialMargin']) + 
+                                float(position['maintMargin']))
         
-        for balance in account['balances']:
-            if balance['asset'] == ticker.upper():
-                ticker_free = float(balance['free'])
-                ticker_locked = float(balance['locked'])
-            elif balance['asset'] == 'USDT':
-                usdt_free = float(balance['free'])
-                usdt_locked = float(balance['locked'])
-                
+        # Calculate USDT locked
+        usdt_locked = sum(
+            float(pos['initialMargin']) + float(pos['maintMargin'])
+            for pos in positions
+        )
+        
         return ticker_free, ticker_locked, usdt_free, usdt_locked
     except Exception as e:
         print(f"Error getting positions: {str(e)}")
         return 0.0, 0.0, 0.0, 0.0
 
-# This function cancels all open orders
 def cancel_open_orders(ticker):
-    symbol = f"{ticker.strip().upper()}USDT"
     try:
-        open_orders = client.get_open_orders(symbol=symbol)
-        if not open_orders:
-            print("No open orders to cancel")
-            return
-        
-        for order in open_orders:
-            result = client.cancel_order(symbol=symbol, orderId=order['orderId'],
-)
-            print(f"Cancelled order: {result}")
-        print("All open orders cancelled")
+        symbol = f"{ticker.strip().upper()}USDT"
+        result = client.cancel_open_orders(symbol=symbol)
+        print(f"Cancelled orders for {symbol}: {result}")
     except Exception as e:
         print(f"Error cancelling orders: {str(e)}")
 
 """Main"""
-import time, math, config #file containing the API keys
-from binance.client import Client
+import time, config
 
-"""
-API_KEY = 'your_test_api_key'
-API_SECRET = 'your_test_api_secret'
-"""
-client = Client(config.API_KEY,config.API_SECRET, testnet=True)
-ticker = input("Input ticker: ")
+client = UMFutures(
+    key=config.API_KEY,
+    secret=config.API_SECRET,
+    base_url="https://testnet.binancefuture.com"
+)
 
-bid, ask, status = get_price(ticker)
-print(f"Bid: {bid} | Ask: {ask}")
-ans = 0
-while ans!="1" and ans!="2":      
-    ticker_free, ticker_locked, usdt_free, usdt_locked = get_current_positions(ticker)
-    bid, ask, _ = get_price(ticker)
+if __name__ == "__main__":
+    ticker = input("Input ticker (e.g. BTC): ").strip().upper()
     
-    print(f"\nCurrent positions:")
-    print(f"{ticker.upper()} Available: {ticker_free:.8f} (${ticker_free * bid:.2f})")
-    print(f"{ticker.upper()} Locked in orders: {ticker_locked:.8f} (${ticker_locked * bid:.2f})")
-    print(f"USDT Available: ${usdt_free:.2f}")
-    print(f"USDT Locked in orders: ${usdt_locked:.2f}\n")
-    
-    ans = input("1 - Buy Order\n2 - Sell Order\n3 - Cancel Open Orders\n")
-    if ans == "1":
-        buy_order(ticker)
-    elif ans == "2":
-        sell_order(ticker)
-    elif ans == "3":
-        cancel_open_orders(ticker)
-    else:
-        print("Enter 1, 2, or 3")
-
+    while True:
+        bid, ask, status = get_price(ticker)
+        if status != 200:
+            time.sleep(1)
+            continue
+            
+        ticker_free, ticker_locked, usdt_free, usdt_locked = get_current_positions(ticker)
+        
+        print("\n" + "="*40)
+        print(f"{ticker}USDT Trading Interface")
+        print(f"Bid: {bid:.8f} | Ask: {ask:.8f}")
+        print(f"\n{ticker} Position:")
+        print(f"Available: {ticker_free:.8f} (${ticker_free * bid:.2f})")
+        print(f"Locked: {ticker_locked:.8f} (${ticker_locked * bid:.2f})")
+        print(f"\nUSDT Balance:")
+        print(f"Available: ${usdt_free:.2f}")
+        print(f"Locked: ${usdt_locked:.2f}")
+        print("="*40 + "\n")
+        
+        action = input("1 - Buy/Long\n2 - Sell/Close\n3 - Cancel Orders\n4 - Refresh\nQ - Quit\n> ")
+        
+        if action == "1":
+            buy_order(ticker)
+        elif action == "2":
+            sell_order(ticker)
+        elif action == "3":
+            cancel_open_orders(ticker)
+        elif action.upper() == "Q":
+            break
+        elif action == "4":
+            continue
+        else:
+            print("Invalid selection")
+        
+        time.sleep(1)  # Rate limit protection
 
 
 
