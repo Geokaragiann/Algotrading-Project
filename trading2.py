@@ -1,5 +1,16 @@
 import pandas as pd
 import numpy as np
+import ccxt
+
+def fetch_ohlcv_data(symbol='BTC/USDT', timeframe='1d', limit=100):
+    """
+    Fetches OHLCV data from Binance using CCXT.
+    """
+    exchange = ccxt.binance()
+    ohlcv = exchange.fetch_ohlcv(symbol, timeframe=timeframe, limit=limit)
+    df = pd.DataFrame(ohlcv, columns=['Date', 'Open', 'High', 'Low', 'Close', 'Volume'])
+    df['Date'] = pd.to_datetime(df['Date'], unit='ms')
+    return df
 
 def detect_swings(data, window=2):
     """
@@ -32,10 +43,9 @@ def calculate_fib_levels(swing_high, swing_low, levels=[0.236, 0.382, 0.5, 0.618
     return fib_levels
 
 def main():
-    # Load BTC OHLC data (ensure the CSV has columns: Date, Open, High, Low, Close)
-    df = pd.read_csv('BTC_daily.csv', parse_dates=['Date'])
-    df.sort_values('Date', inplace=True)  # Ensure data is sorted by date
-    
+    # Fetch OHLCV data from Binance
+    df = fetch_ohlcv_data(symbol='BTC/USDT', timeframe='1d', limit=100)
+
     # Detect swing highs/lows
     df = detect_swings(df, window=2)
 
