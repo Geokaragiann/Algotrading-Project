@@ -2,6 +2,33 @@ import pandas as pd
 import numpy as np
 import ccxt
 
+def generate_fib_signals(data, window=2, threshold=0.01):
+    """
+    Generate trading signals based on Fibonacci retracement levels
+    Returns a Series with 1 (buy), -1 (sell), or 0 (hold)
+    """
+    # Detect swings
+    data_with_swings = detect_swings(data.copy(), window)
+    signals = pd.Series(0, index=data.index)
+    
+    for i in range(window, len(data) - 1):
+        if data_with_swings['SwingHigh'].iloc[i]:
+            swing_high = data_with_swings['High'].iloc[i]
+            # Find the next swing low
+            next_lows = data_with_swings.iloc[i:][data_with_swings['SwingLow']]
+            if not next_lows.empty:
+                swing_low = next_lows['Low'].iloc[0]
+                fib_levels = calculate_fib_levels(swing_high, swing_low)
+                
+                # Generate signals based on price crossing Fibonacci levels
+                current_price = data['Close'].iloc[i]
+                for level, price in fib_levels.items():
+                    if abs(current_price - price) / price < threshold:
+                        signals.iloc[i] = 1  # Buy signal at support levels
+                        
+    return signals
+
+
 def fetch_ohlcv_data(symbol='BTC/USDT', timeframe='1d', limit=100):
     """
     Fetches OHLCV data from Binance using CCXT.
