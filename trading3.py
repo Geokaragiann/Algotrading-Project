@@ -1,20 +1,22 @@
 import pandas as pd
-import talib
+import pandas_ta as ta
+import ccxt
+import time
 
 def detect_candlestick_patterns(df):
     """
-    Detects key candlestick reversal patterns using TA-Lib.
+    Detects key candlestick reversal patterns using pandas_ta.
     """
     patterns = {
-        "Engulfing": talib.CDLENGULFING(df['Open'], df['High'], df['Low'], df['Close']),
-        "Hammer": talib.CDLHAMMER(df['Open'], df['High'], df['Low'], df['Close']),
-        "Inverted Hammer": talib.CDLINVERTEDHAMMER(df['Open'], df['High'], df['Low'], df['Close']),
-        "Shooting Star": talib.CDLSHOOTINGSTAR(df['Open'], df['High'], df['Low'], df['Close']),
-        "Doji": talib.CDLDOJI(df['Open'], df['High'], df['Low'], df['Close']),
-        "Morning Star": talib.CDLMORNINGSTAR(df['Open'], df['High'], df['Low'], df['Close']),
-        "Evening Star": talib.CDLEVENINGSTAR(df['Open'], df['High'], df['Low'], df['Close']),
-        "Three White Soldiers": talib.CDL3WHITESOLDIERS(df['Open'], df['High'], df['Low'], df['Close']),
-        "Three Black Crows": talib.CDL3BLACKCROWS(df['Open'], df['High'], df['Low'], df['Close']),
+        "Engulfing": ta.cdl_engulfing(df['Open'], df['High'], df['Low'], df['Close']),
+        "Hammer": ta.cdl_hammer(df['Open'], df['High'], df['Low'], df['Close']),
+        "Inverted Hammer": ta.cdl_inverted_hammer(df['Open'], df['High'], df['Low'], df['Close']),
+        "Shooting Star": ta.cdl_shooting_star(df['Open'], df['High'], df['Low'], df['Close']),
+        "Doji": ta.cdl_doji(df['Open'], df['High'], df['Low'], df['Close']),
+        "Morning Star": ta.cdl_morning_star(df['Open'], df['High'], df['Low'], df['Close']),
+        "Evening Star": ta.cdl_evening_star(df['Open'], df['High'], df['Low'], df['Close']),
+        "Three White Soldiers": ta.cdl_three_white_soldiers(df['Open'], df['High'], df['Low'], df['Close']),
+        "Three Black Crows": ta.cdl_three_black_crows(df['Open'], df['High'], df['Low'], df['Close']),
     }
 
     for pattern, values in patterns.items():
@@ -24,9 +26,9 @@ def detect_candlestick_patterns(df):
 
 def calculate_rsi(df, period=14):
     """
-    Calculates the RSI (Relative Strength Index).
+    Calculates the RSI (Relative Strength Index) using pandas_ta.
     """
-    df['RSI'] = talib.RSI(df['Close'], timeperiod=period)
+    df['RSI'] = ta.rsi(df['Close'], length=period)
     return df
 
 def filter_signals(df):
@@ -46,13 +48,28 @@ def filter_signals(df):
 
     return df
 
-def main():
-    # Load BTC OHLC daily data (ensure it has 'Date', 'Open', 'High', 'Low', 'Close' columns)
-    df = pd.read_csv("BTC_daily.csv", parse_dates=['Date'])
-    df.sort_values("Date", inplace=True)
+def fetch_binance_data():
+    """
+    Fetches the last 100 days of OHLCV data from Binance using ccxt.
+    """
+    exchange = ccxt.binance()
+    symbol = 'BTC/USDT'  # Symbol for BTC in USDT
+    timeframe = '1d'  # Daily timeframe
+    limit = 100  # Last 100 days of data
 
-    # Keep only the last 100 days
-    df = df.tail(100).reset_index(drop=True)
+    # Fetch historical OHLCV data (Open, High, Low, Close, Volume)
+    ohlcv = exchange.fetch_ohlcv(symbol, timeframe, limit=limit)
+    
+    # Convert the OHLCV data into a pandas DataFrame
+    ohlcv_df = pd.DataFrame(ohlcv, columns=['Date', 'Open', 'High', 'Low', 'Close', 'Volume'])
+    ohlcv_df['Date'] = pd.to_datetime(ohlcv_df['Date'], unit='ms')  # Convert timestamp to datetime
+    ohlcv_df.set_index('Date', inplace=True)
+
+    return ohlcv_df
+
+def main():
+    # Fetch BTC data from Binance
+    df = fetch_binance_data()
 
     # Detect candlestick patterns
     df = detect_candlestick_patterns(df)
@@ -64,8 +81,8 @@ def main():
     df = filter_signals(df)
 
     # Print the last 100 days with confirmed signals
-    latest_signals = df[['Date', 'Close', 'RSI', 'Bullish Confirmation', 'Bearish Confirmation']]
-    
+    latest_signals = df[['Close', 'RSI', 'Bullish Confirmation', 'Bearish Confirmation']]
+
     print("Confirmed Trading Signals (Last 100 Days):")
     print(latest_signals[latest_signals[['Bullish Confirmation', 'Bearish Confirmation']].any(axis=1)])
 
