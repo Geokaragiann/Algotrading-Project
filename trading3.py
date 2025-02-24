@@ -47,9 +47,12 @@ def filter_signals(df):
     return df
 
 def main():
-    # Load BTC OHLC data (ensure it has 'Date', 'Open', 'High', 'Low', 'Close' columns)
+    # Load BTC OHLC daily data (ensure it has 'Date', 'Open', 'High', 'Low', 'Close' columns)
     df = pd.read_csv("BTC_daily.csv", parse_dates=['Date'])
     df.sort_values("Date", inplace=True)
+
+    # Keep only the last 100 days
+    df = df.tail(100).reset_index(drop=True)
 
     # Detect candlestick patterns
     df = detect_candlestick_patterns(df)
@@ -60,10 +63,10 @@ def main():
     # Filter signals based on RSI confirmation
     df = filter_signals(df)
 
-    # Print the most recent confirmed signals
-    latest_signals = df.iloc[-10:][['Date', 'Close', 'RSI', 'Bullish Confirmation', 'Bearish Confirmation']]
+    # Print the last 100 days with confirmed signals
+    latest_signals = df[['Date', 'Close', 'RSI', 'Bullish Confirmation', 'Bearish Confirmation']]
     
-    print("Latest Confirmed Trading Signals:")
+    print("Confirmed Trading Signals (Last 100 Days):")
     print(latest_signals[latest_signals[['Bullish Confirmation', 'Bearish Confirmation']].any(axis=1)])
 
 if __name__ == "__main__":
