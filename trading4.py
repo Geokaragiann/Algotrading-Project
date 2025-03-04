@@ -6,24 +6,26 @@ def fetch_and_analyze_dax40_today():
     """
     Fetches today's DAX40 data and analyzes trade setups with detailed explanation
     """
-    # Manual input of the correct high from TradingView
-    high = 22528.00  # Correct high from TradingView
-    
     # Download today's data for the low and subsequent price action
     df = yf.download('^GDAXI', interval='15m', period='1d', progress=False)
 
     if not df.empty:
-        # Convert index to datetime
-        df.index = pd.to_datetime(df.index)
+        # Convert index to datetime and convert to CET
+        df.index = pd.to_datetime(df.index).tz_convert('Europe/Berlin')
         
-        # Get today's 08:00 candle
-        opening_candle = df[df.index.time == pd.to_datetime('08:00').time()]
+        # Debug: Print the first few rows to verify time zone
+        print("Data with CET Time Zone:")
+        print(df.head())
+        
+        # Get today's 09:00 CET candle
+        opening_candle = df[df.index.time == pd.to_datetime('09:00').time()]
         
         if not opening_candle.empty:
             first_candle = opening_candle.iloc[0]
             
-            # Get low value
+            # Get low and high values using MultiIndex
             low = float(first_candle[('Low', '^GDAXI')])
+            high = float(first_candle[('High', '^GDAXI')])
             
             # Calculate risk and take profit distances
             risk = high - low
