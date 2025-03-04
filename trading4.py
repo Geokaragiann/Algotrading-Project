@@ -36,7 +36,7 @@ def fetch_and_analyze_dax40_today():
             short_tp = low - take_profit_distance
             
             # Print initial setup
-            print(f"\nOpening Candle (08:00-08:15):")
+            print(f"\nOpening Candle (09:00-09:15):")
             print(f"High: {high:.2f}")
             print(f"Low: {low:.2f}")
             print(f"Risk Range: {risk:.2f} points")
