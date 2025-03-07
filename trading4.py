@@ -29,7 +29,7 @@ def fetch_and_analyze_dax40_today():
             
             # Calculate risk and take profit distances
             risk = high - low
-            take_profit_distance = risk * 0.5  # 50% of risk
+            take_profit_distance = risk * 0.8  # 80% of risk
             
             # Calculate take profit levels
             long_tp = high + take_profit_distance
