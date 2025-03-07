@@ -1,3 +1,5 @@
 config.py
 __pycache__
-.idea
+.idea*.lib
+myenv/
+venv/
