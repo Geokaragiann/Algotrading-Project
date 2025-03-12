@@ -1,342 +1,256 @@
-# Copyright (C) 2025 The Repository Collaborators
+import pandas as pd
+from ibapi.client import EClient
+from ibapi.wrapper import EWrapper
+from ibapi.contract import Contract
+from ibapi.order import Order
+import threading
+import time
+from datetime import datetime, timedelta, time as dt_time
+import pytz
+import exchange_calendars as xcals
+import logging
 
-# This program is free software: you can redistribute it and/or modify  
-# it under the terms of the GNU Affero General Public License as published by  
-# the Free Software Foundation, either version 3 of the License, or  
-# (at your option) any later version.  
+# Set up logging
+logging.basicConfig(filename='breakout_trading.log', level=logging.INFO, 
+                    format='%(asctime)s - %(levelname)s - %(message)s')
 
-# This program is distributed in the hope that it will be useful,  
-# but WITHOUT ANY WARRANTY; without even the implied warranty of  
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the  
-# GNU Affero General Public License for more details.  
+class BreakoutApp(EWrapper, EClient):
+    def __init__(self, index_symbol="NAS100", opening_time="09:30"):
+        EClient.__init__(self, self)
+        self.nextOrderId = None
+        self.historical_data = []
+        self.opening_candle = None
+        self.position = None  # None, 'long', or 'short'
+        self.entry_price = None
+        self.sl_price = None
+        self.tp_price = None
+        self.index_symbol = index_symbol
+        self.opening_time = opening_time
+        self.data_ready = threading.Event()
+        self.trades = []
 
-# You should have received a copy of the GNU Affero General Public License  
-# along with this program. If not, see <https://www.gnu.org/licenses/>.
+    def nextValidId(self, orderId: int):
+        self.nextOrderId = orderId
+        logging.info(f"Next valid order ID received: {orderId}")
+        print(f"Connected to IBKR. Next order ID: {orderId}")
 
-"""Functions"""
-from binance.um_futures import UMFutures
-import math
+    def historicalData(self, reqId, bar):
+        self.historical_data.append({
+            'Open': bar.open,
+            'High': bar.high,
+            'Low': bar.low,
+            'Close': bar.close,
+            'Date': pd.to_datetime(bar.date, format='%Y%m%d %H:%M:%S')
+        })
 
-def get_price(ticker):
-    try:
-        symbol = f"{ticker.upper()}USDT"
-        ticker_price = client.book_ticker(symbol=symbol)
-        bid_price = float(ticker_price['bidPrice'])
-        ask_price = float(ticker_price['askPrice'])
-        return bid_price, ask_price, 200
-    except Exception as e:
-        print(f"Failed to retrieve data: {str(e)}")
-        return None, None, 400
+    def historicalDataEnd(self, reqId, start, end):
+        logging.info("Historical data retrieval complete")
+        print("Historical data retrieved.")
+        opening_candle_time = pd.to_datetime(self.opening_time).time()
+        for bar in self.historical_data:
+            if bar['Date'].time() == opening_candle_time:
+                self.opening_candle = bar
+                logging.info(f"Opening candle set: Open={bar['Open']}, High={bar['High']}, "
+                             f"Low={bar['Low']}, Close={bar['Close']}")
+                print(f"Opening candle set at {self.opening_time}: Open={bar['Open']}, "
+                      f"High={bar['High']}, Low={bar['Low']}, Close={bar['Close']}")
+                break
+        if self.opening_candle:
+            self.data_ready.set()
+        else:
+            logging.warning("Opening candle not found.")
+            print("Warning: Opening candle not found. Check time or data availability.")
 
-def get_price_precision(ticker):
-    try:
-        symbol = f"{ticker.upper()}USDT"
-        exchange_info = client.exchange_info()
-        for sym in exchange_info['symbols']:
-            if sym['symbol'] == symbol:
-                for filt in sym['filters']:
-                    if filt['filterType'] == 'PRICE_FILTER':
-                        tick_size = filt['tickSize']
-                        return int(round(-math.log10(float(tick_size))))
-        return 2  # default precision
-    except Exception as e:
-        print(f"Error getting price precision: {str(e)}")
-        return 2
-
-# Determines how many decimal places should be used for order quantities.
-def get_quantity_precision(ticker):
-    try:
-        symbol = f"{ticker.upper()}USDT"
-        exchange_info = client.exchange_info()
-        for sym in exchange_info['symbols']:
-            if sym['symbol'] == symbol:
-                for filt in sym['filters']:
-                    if filt['filterType'] == 'LOT_SIZE':
-                        return int(round(-math.log10(float(filt['stepSize'])))) # Convert stepSize (e.g., 0.001) to decimal places (3)
-        return 4  # default precision
-    except Exception as e:
-        print(f"Error getting precision: {str(e)}")
-        return 4
-# Gets the minimum order value (notional) allowed by the exchange for that symbol.
-def get_min_notional(ticker):
-    try:
-        symbol = f"{ticker.upper()}USDT"
-        exchange_info = client.exchange_info()
-        for sym in exchange_info['symbols']:
-            if sym['symbol'] == symbol:
-                for filt in sym['filters']:
-                    if filt['filterType'] == 'MIN_NOTIONAL':
-                        return float(filt['notional'])
-        return 5.0  # default minimum notional
-    except Exception as e:
-        print(f"Error getting min notional: {str(e)}")
-        return 5.0
-
-def buy_order(ticker):
-    try:
-        symbol = f"{ticker.strip().upper()}USDT"
-        bid_price, ask_price, _ = get_price(ticker)
-        if bid_price is None:
+    def tickPrice(self, reqId, tickType, price, attrib):
+        if tickType != 4:  # 4 = Last price
+            return
+        if not self.opening_candle:
             return
 
-        qty_precision = get_quantity_precision(ticker)
-        quantity = input(f"Input quantity (precision {qty_precision}): ")
-        
-        # Validate quantity format
-        try:
-            quantity = float(quantity)
-            quantity = round(quantity, qty_precision)
-        except ValueError:
-            print("Invalid quantity format")
+        now = datetime.now(pytz.timezone('US/Eastern'))
+        opening_open = self.opening_candle['Open']
+        opening_high = self.opening_candle['High']
+        opening_low = self.opening_candle['Low']
+        opening_close = self.opening_candle['Close']
+
+        if opening_close > opening_open:
+            candle_color = 'green'
+            long_sl = opening_low - 8
+            short_sl = opening_high + 8
+        elif opening_close < opening_open:
+            candle_color = 'red'
+            long_sl = opening_low - 8
+            short_sl = opening_high + 8
+        else:
             return
 
-        order_value = quantity * ask_price
-        min_notional = get_min_notional(ticker)
-        
-        if order_value < min_notional:
-            print(f"Order value ({order_value:.2f} USDT) < min ({min_notional} USDT)")
-            return
+        risk = opening_high - opening_low
+        long_tp = opening_high + (risk * 0.8)
+        short_tp = opening_low - (risk * 0.8)
 
-        # Get stop loss and take profit percentages
-        print(f"\nCurrent Ask Price: {ask_price:.8f}")
-        sl_percent = input("Enter stop loss percentage (0 to skip): ")
-        tp_percent = input("Enter take profit percentage (0 to skip): ")
+        trade_result = {
+            'Date': now.date(),
+            'Candle_Color': candle_color,
+            'Opening_High': opening_high,
+            'Opening_Low': opening_low,
+            'Long_SL': long_sl,
+            'Long_TP': long_tp,
+            'Short_SL': short_sl,
+            'Short_TP': short_tp,
+            'Long_Result': 'Not Triggered',
+            'Long_Points': 0,
+            'Short_Result': 'Not Triggered',
+            'Short_Points': 0
+        }
 
-        try:
-            sl_percent = float(sl_percent) if sl_percent != '0' else 0
-            tp_percent = float(tp_percent) if tp_percent != '0' else 0
-        except ValueError:
-            print("Invalid percentage format")
-            return
+        if self.position is None:
+            if price > opening_high:
+                self.enter_trade('long', opening_high, long_sl, long_tp, trade_result)
+            elif price < opening_low:
+                self.enter_trade('short', opening_low, short_sl, short_tp, trade_result)
+        elif self.position == 'long':
+            if price <= self.sl_price:
+                self.exit_trade('long', 'SL Hit', self.sl_price, trade_result)
+            elif price >= self.tp_price:
+                self.exit_trade('long', 'TP Hit', self.tp_price, trade_result)
+            elif now.time() >= dt_time(16, 0):
+                self.exit_trade('long', 'EOD', price, trade_result)
+        elif self.position == 'short':
+            if price >= self.sl_price:
+                self.exit_trade('short', 'SL Hit', self.sl_price, trade_result)
+            elif price <= self.tp_price:
+                self.exit_trade('short', 'TP Hit', self.tp_price, trade_result)
+            elif now.time() >= dt_time(16, 0):
+                self.exit_trade('short', 'EOD', price, trade_result)
 
-        # Send futures order
-        order = client.new_order(
-            symbol=symbol,
-            side='BUY',
-            type='MARKET',
-            quantity=quantity
-        )
-        print(f"\nLong position opened: {order}")
+    def enter_trade(self, trade_type, entry_price, sl_price, tp_price, trade_result):
+        order = Order()
+        order.action = "BUY" if trade_type == 'long' else "SELL"
+        order.totalQuantity = 1  # Adjust for CFD contract size if needed
+        order.orderType = "MKT"
+        self.placeOrder(self.nextOrderId, self.contract, order)
+        self.position = trade_type
+        self.entry_price = entry_price
+        self.sl_price = sl_price
+        self.tp_price = tp_price
+        logging.info(f"Entered {trade_type.upper()} at {entry_price}, SL={sl_price}, TP={tp_price}")
+        print(f"Trade Entered: {trade_type.upper()} at {entry_price}, SL={sl_price}, TP={tp_price}")
+        self.nextOrderId += 1
+        if trade_type == 'long':
+            trade_result['Long_Result'] = 'Triggered'
+        else:
+            trade_result['Short_Result'] = 'Triggered'
 
-        # Calculate stop loss and take profit prices
-        price_precision = get_price_precision(ticker)
-        sl_price = round(ask_price * (1 - sl_percent / 100), price_precision) if sl_percent > 0 else 0
-        tp_price = round(ask_price * (1 + tp_percent / 100), price_precision) if tp_percent > 0 else 0
-        
-        # Place stop loss order
-        if sl_price > 0:
-            try:
-                sl_order = client.new_order(
-                    symbol=symbol,
-                    side='SELL',
-                    type='STOP_MARKET',
-                    quantity=quantity,
-                    stopPrice=sl_price,
-                    reduceOnly=True
-                )
-                print(f"\nStop loss order placed: {sl_order}")
-            except Exception as e:
-                print(f"Stop loss error: {e}")
+    def exit_trade(self, trade_type, result, exit_price, trade_result):
+        order = Order()
+        order.action = "SELL" if trade_type == 'long' else "BUY"
+        order.totalQuantity = 1
+        order.orderType = "MKT"
+        self.placeOrder(self.nextOrderId, self.contract, order)
+        points = exit_price - self.entry_price if trade_type == 'long' else self.entry_price - exit_price
+        if trade_type == 'long':
+            trade_result['Long_Result'] = result
+            trade_result['Long_Points'] = points
+        else:
+            trade_result['Short_Result'] = result
+            trade_result['Short_Points'] = points
+        self.trades.append(trade_result)
+        logging.info(f"Exited {trade_type.upper()}: {result}, Points={points}")
+        print(f"Trade Exited: {trade_type.upper()} - {result}, Points={points}")
+        self.position = None
+        self.nextOrderId += 1
 
-        # Place take profit order
-        if tp_price > 0:
-            try:
-                tp_order = client.new_order(
-                    symbol=symbol,
-                    side='SELL',
-                    type='TAKE_PROFIT_MARKET',
-                    quantity=quantity,
-                    stopPrice=tp_price,
-                    reduceOnly=True
-                )
-                print(f"\nTake profit order placed: {tp_order}")
-            except Exception as e:
-                print(f"Take profit error: {e}")
+    def error(self, reqId, errorCode, errorString):
+        logging.error(f"Error {errorCode}: {errorString}")
+        print(f"IBKR Error {errorCode}: {errorString}")
 
-    except Exception as e:
-        print(f"Order failed: {str(e)}")
+def run_loop(app):
+    app.run()
 
+def wait_for_opening_candle(opening_time="09:30"):
+    eastern = pytz.timezone('US/Eastern')
+    now = datetime.now(eastern)
+    opening_hour, opening_minute = map(int, opening_time.split(":"))
+    target_time = now.replace(hour=opening_hour, minute=opening_minute + 15, second=0, microsecond=0)
+    if now < target_time:
+        wait_seconds = (target_time - now).total_seconds()
+        logging.info(f"Waiting {wait_seconds / 60:.1f} minutes until {opening_time} +15 minutes...")
+        print(f"Current time: {now.strftime('%H:%M:%S %Z')}. Waiting {wait_seconds / 60:.1f} minutes until {opening_time} +15 minutes...")
+        time.sleep(wait_seconds)
+    else:
+        print(f"Past {opening_time} +15 minutes. Checking for opening candle now.")
 
-def sell_order(ticker):
-    try:
-        symbol = f"{ticker.strip().upper()}USDT"
-        bid_price, ask_price, _ = get_price(ticker)
-        if bid_price is None:
-            return
+def main():
+    nyse = xcals.get_calendar("NYSE")
+    today = datetime.now().date()
+    if not nyse.is_session(today):
+        logging.info("Not a trading day. Exiting.")
+        print(f"Today ({today}) is not a trading day (e.g., weekend or holiday). Exiting.")
+        return
 
-        qty_precision = get_quantity_precision(ticker)
-        quantity = input(f"Input quantity (precision {qty_precision}): ")
-        
-        try:
-            quantity = float(quantity)
-            quantity = round(quantity, qty_precision)
-        except ValueError:
-            print("Invalid quantity format")
-            return
+    print(f"Starting breakout strategy for NASDAQ CFD on {today}...")
+    logging.info(f"Starting breakout strategy for NASDAQ CFD on {today}")
 
-        order_value = quantity * bid_price
-        min_notional = get_min_notional(ticker)
-        
-        if order_value < min_notional:
-            print(f"Order value ({order_value:.2f} USDT) < min ({min_notional} USDT)")
-            return
+    app = BreakoutApp(index_symbol="NAS100", opening_time="09:30")
+    app.connect("127.0.0.1", 7497, clientId=123)
+    api_thread = threading.Thread(target=run_loop, args=(app,), daemon=True)
+    api_thread.start()
+    time.sleep(2)
 
-        # Get stop loss and take profit percentages
-        print(f"\nCurrent Bid Price: {bid_price:.8f}")
-        sl_percent = input("Enter stop loss percentage (0 to skip): ")
-        tp_percent = input("Enter take profit percentage (0 to skip): ")
+    # Define NASDAQ 100 CFD contract
+    app.contract = Contract()
+    app.contract.symbol = app.index_symbol  # "NAS100"
+    app.contract.secType = "CFD"
+    app.contract.exchange = "SMART"
+    app.contract.currency = "USD"
 
-        try:
-            sl_percent = float(sl_percent) if sl_percent != '0' else 0
-            tp_percent = float(tp_percent) if tp_percent != '0' else 0
-        except ValueError:
-            print("Invalid percentage format")
-            return
+    wait_for_opening_candle(app.opening_time)
 
-        # Send futures order
-        order = client.new_order(
-            symbol=symbol,
-            side='SELL',
-            type='MARKET',
-            quantity=quantity
-        )
-        print(f"\nPosition closed: {order}")
+    print("Requesting historical data for opening candle...")
+    app.reqHistoricalData(
+        reqId=1,
+        contract=app.contract,
+        endDateTime="",
+        durationStr="1 D",
+        barSizeSetting="15 mins",
+        whatToShow="TRADES",
+        useRTH=1,
+        formatDate=1,
+        keepUpToDate=False,
+        chartOptions=[]
+    )
 
-        # Calculate stop loss and take profit prices
-        price_precision = get_price_precision(ticker)
-        sl_price = round(bid_price * (1 + sl_percent / 100), price_precision) if sl_percent > 0 else 0
-        tp_price = round(bid_price * (1 - tp_percent / 100), price_precision) if tp_percent > 0 else 0
+    app.data_ready.wait(timeout=10)
+    if not app.opening_candle:
+        logging.error("Failed to get opening candle. Exiting.")
+        print("Error: Failed to get opening candle. Check IBKR connection or timing. Exiting.")
+        app.disconnect()
+        return
 
-        # Place stop loss order
-        if sl_price > 0:
-            try:
-                sl_order = client.new_order(
-                    symbol=symbol,
-                    side='BUY',
-                    type='STOP_MARKET',
-                    quantity=quantity,
-                    stopPrice=sl_price,
-                    reduceOnly=True
-                )
-                print(f"\nStop loss order placed: {sl_order}")
-            except Exception as e:
-                print(f"Stop loss error: {e}")
+    print("Subscribing to real-time market data...")
+    app.reqMarketDataType(3)  # Delayed data for paper trading
+    app.reqMktData(2, app.contract, "", False, False, [])
 
-        # Place take profit order
-        if tp_price > 0:
-            try:
-                tp_order = client.new_order(
-                    symbol=symbol,
-                    side='BUY',
-                    type='TAKE_PROFIT_MARKET',
-                    quantity=quantity,
-                    stopPrice=tp_price,
-                    reduceOnly=True
-                )
-                print(f"\nTake profit order placed: {tp_order}")
-            except Exception as e:
-                print(f"Take profit error: {e}")
+    eastern = pytz.timezone('US/Eastern')
+    print("Monitoring NASDAQ CFD for breakouts until 4:00 PM ET...")
+    while datetime.now(eastern).time() < dt_time(16, 0):
+        time.sleep(1)
 
-    except Exception as e:
-        print(f"Order failed: {str(e)}")
+    if app.position:
+        app.exit_trade(app.position, 'EOD', app.entry_price, app.trades[-1])
+        print("Market closed. Closed open position at EOD.")
 
+    results_df = pd.DataFrame(app.trades)
+    if not results_df.empty:
+        results_df.to_csv('trade_results.csv', index=False)
+        logging.info("Trade results saved to 'trade_results.csv'")
+        print("Trading session complete. Results saved to 'trade_results.csv'")
+    else:
+        print("No trades executed today.")
 
-def get_current_positions(ticker):
-    try:
-        account_info = client.account()
-        positions = account_info['positions']
-        symbol = f"{ticker.upper()}USDT"
-        
-        ticker_free = 0.0
-        ticker_locked = 0.0
-        usdt_free = float(account_info['availableBalance'])
-        usdt_locked = 0.0
-
-        for position in positions:
-            if position['symbol'] == symbol:
-                ticker_free = float(position['positionAmt'])
-                ticker_locked = (float(position['initialMargin']) + 
-                                float(position['maintMargin']))
-        
-        # Calculate USDT locked
-        usdt_locked = sum(
-            float(pos['initialMargin']) + float(pos['maintMargin'])
-            for pos in positions
-        )
-        
-        return ticker_free, ticker_locked, usdt_free, usdt_locked
-    except Exception as e:
-        print(f"Error getting positions: {str(e)}")
-        return 0.0, 0.0, 0.0, 0.0
-
-def cancel_open_orders(ticker):
-    try:
-        symbol = f"{ticker.strip().upper()}USDT"
-        result = client.cancel_open_orders(symbol=symbol)
-        print(f"Cancelled orders for {symbol}: {result}")
-    except Exception as e:
-        print(f"Error cancelling orders: {str(e)}")
-
-"""Main"""
-import time, config
-
-client = UMFutures(
-    key=config.API_KEY,
-    secret=config.API_SECRET,
-    base_url="https://testnet.binancefuture.com"
-)
+    app.disconnect()
+    logging.info("Market closed. Disconnected.")
+    print("Disconnected from IBKR. Strategy stopped.")
 
 if __name__ == "__main__":
-    ticker = input("Input ticker (e.g. BTC): ").strip().upper()
-    
-    while True:
-        bid, ask, status = get_price(ticker)
-        if status != 200:
-            time.sleep(1)
-            continue
-            
-        ticker_free, ticker_locked, usdt_free, usdt_locked = get_current_positions(ticker)
-        
-        print("\n" + "="*40)
-        print(f"{ticker}USDT Trading Interface")
-        print(f"Bid: {bid:.8f} | Ask: {ask:.8f}")
-        print(f"\n{ticker} Position:")
-        print(f"Available: {ticker_free:.8f} (${ticker_free * bid:.2f})")
-        print(f"Locked: {ticker_locked:.8f} (${ticker_locked * bid:.2f})")
-        print(f"\nUSDT Balance:")
-        print(f"Available: ${usdt_free:.2f}")
-        print(f"Locked: ${usdt_locked:.2f}")
-        print("="*40 + "\n")
-        
-        action = input("1 - Buy/Long\n2 - Sell/Close\n3 - Cancel Orders\n4 - Refresh\nQ - Quit\n> ")
-        
-        if action == "1":
-            buy_order(ticker)
-        elif action == "2":
-            sell_order(ticker)
-        elif action == "3":
-            cancel_open_orders(ticker)
-        elif action.upper() == "Q":
-            break
-        elif action == "4":
-            continue
-        else:
-            print("Invalid selection")
-        
-        time.sleep(1)  # Rate limit protection
-
-
-
-
-
-
-
-
-# while True:
-#     bid_price, ask_price, status = get_price(ticker)
-#     if status == 400:
-#         break
-#     print(f"Bid: {bid_price} | Ask: {ask_price}")
-#     time.sleep(1)
-
-
+    main()

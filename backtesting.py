@@ -2,21 +2,23 @@ import pandas as pd
 import yfinance as yf
 from datetime import datetime, timedelta
 
-class DaxBreakoutStrategy:
+class BreakoutStrategy:
     def __init__(self):
         """Initialize the strategy with an empty list to store trade results."""
         self.trades = []
         
-    def analyze_day(self, day_data):
+    def analyze_day(self, day_data, opening_time):
         """
         Analyze a single day's 15-minute candle data to determine trade outcomes.
         
         Args:
             day_data (pd.DataFrame): 15-minute OHLC data for a single trading day.
+            opening_time (str): Time of the opening candle in 'HH:MM' format (e.g., '14:45').
         """
-        # Identify the opening 15-minute candle (08:00-08:15 for DAX)
-        # CAREFUL! ADJUST FOR DAYLIGHT SAVING TIME IF NECESSARY!
-        opening_candle = day_data[day_data.index.time == pd.to_datetime('14:45').time()]
+        # Identify the opening 15-minute candle based on the provided opening time
+        # CAREFUL! ADJUST FOR TIMEZONE OR DAYLIGHT SAVING TIME IF NECESSARY!
+        opening_candle_time = pd.to_datetime(opening_time).time()
+        opening_candle = day_data[day_data.index.time == opening_candle_time]
         
         if opening_candle.empty:
             return
@@ -30,12 +32,12 @@ class DaxBreakoutStrategy:
         # Determine candle color and set stop loss levels
         if opening_close > opening_open:
             candle_color = 'green'
-            long_sl = opening_low - 8    # Long SL 10 points below high
-            short_sl = opening_high + 8    # Short SL 10 points above low
+            long_sl = opening_low - 8    # Long SL 8 points below low
+            short_sl = opening_high + 8  # Short SL 8 points above high
         elif opening_close < opening_open:
             candle_color = 'red'
-            long_sl = opening_low - 8    # Long SL 10 points below high
-            short_sl = opening_high + 8    # Short SL 10 points above low
+            long_sl = opening_low - 8    # Long SL 8 points below low
+            short_sl = opening_high + 8  # Short SL 8 points above high
         else:
             return
         
@@ -135,16 +137,22 @@ class DaxBreakoutStrategy:
         
         self.trades.append(trade_result)
 
-def run_backtest():
-    # Set date range to include today
-    start_date = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')
-    # Extend end_date to tomorrow to ensure today's data is included
+def run_backtest(index_symbol='^IXIC', opening_time='14:45'):
+    """
+    Run the backtest for a given index and opening time.
+    
+    Args:
+        index_symbol (str): The ticker symbol for the index (e.g., '^IXIC' for NASDAQ).
+        opening_time (str): Time of the opening candle in 'HH:MM' format (e.g., '14:45').
+    """
+    # Set date range to include recent data
+    start_date = (datetime.now() - timedelta(days=20)).strftime('%Y-%m-%d')
     end_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
     
-    print(f"Fetching DAX data from {start_date} to {end_date}...")
+    print(f"Fetching data for {index_symbol} from {start_date} to {end_date}...")
     try:
-        dax_data = yf.download(
-            '^IXIC',
+        index_data = yf.download(
+            index_symbol,
             start=start_date,
             end=end_date,
             interval='15m',
@@ -154,23 +162,23 @@ def run_backtest():
         print(f"Error downloading data: {e}")
         return
     
-    if dax_data.empty:
+    if index_data.empty:
         print("No data downloaded. Possible reasons:")
         print("- Market might be closed (e.g., weekend or holiday)")
         print("- Data not yet available for today")
         print("- Internet connection issue")
-        print(f"Last index timestamp: {dax_data.index[-1] if not dax_data.empty else 'N/A'}")
+        print(f"Last index timestamp: {index_data.index[-1] if not index_data.empty else 'N/A'}")
         return
     
     # Remove timezone for consistency
-    dax_data.index = dax_data.index.tz_localize(None)
-    print(f"Data retrieved. Last timestamp: {dax_data.index[-1]}")
+    index_data.index = index_data.index.tz_localize(None)
+    print(f"Data retrieved. Last timestamp: {index_data.index[-1]}")
     
     print("Running strategy analysis...")
-    strategy = DaxBreakoutStrategy()
+    strategy = BreakoutStrategy()
     
-    for date, day_data in dax_data.groupby(dax_data.index.date):
-        strategy.analyze_day(day_data)
+    for date, day_data in index_data.groupby(index_data.index.date):
+        strategy.analyze_day(day_data, opening_time)
     
     results_df = pd.DataFrame(strategy.trades)
     
@@ -238,4 +246,6 @@ def run_backtest():
         print("No trades were executed in the backtest period.")
 
 if __name__ == "__main__":
-    run_backtest()
+    # Example: Customize index_symbol and opening_time as needed
+    run_backtest(index_symbol='^IXIC', opening_time='14:45')  # NASDAQ, 14:45 opening
+    # run_backtest(index_symbol='^GSPC', opening_time='09:30')  # S&P 500, 09:30 opening
