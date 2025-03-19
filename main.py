@@ -10,12 +10,19 @@ import pytz
 import exchange_calendars as xcals
 import logging
 
-# Set up logging
+# General logging setup
 logging.basicConfig(filename='breakout_trading.log', level=logging.INFO, 
                     format='%(asctime)s - %(levelname)s - %(message)s')
 
+# Trade-specific logging setup
+trade_logger = logging.getLogger('trade_logger')
+trade_handler = logging.FileHandler('trade_execution.log')
+trade_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
+trade_logger.addHandler(trade_handler)
+trade_logger.setLevel(logging.INFO)
+
 class BreakoutApp(EWrapper, EClient):
-    def __init__(self, index_symbol="NAS100", opening_time="09:30"):
+    def __init__(self, index_symbol="NQ", opening_time="09:30"):
         EClient.__init__(self, self)
         self.nextOrderId = None
         self.historical_data = []
@@ -51,7 +58,7 @@ class BreakoutApp(EWrapper, EClient):
             if bar['Date'].time() == opening_candle_time:
                 self.opening_candle = bar
                 logging.info(f"Opening candle set: Open={bar['Open']}, High={bar['High']}, "
-                             f"Low={bar['Low']}, Close={bar['Close']}")
+                            f"Low={bar['Low']}, Close={bar['Close']}")
                 print(f"Opening candle set at {self.opening_time}: Open={bar['Open']}, "
                       f"High={bar['High']}, Low={bar['Low']}, Close={bar['Close']}")
                 break
@@ -82,7 +89,7 @@ class BreakoutApp(EWrapper, EClient):
             long_sl = opening_low - 8
             short_sl = opening_high + 8
         else:
-            return
+            return  # Skip neutral candles
 
         risk = opening_high - opening_low
         long_tp = opening_high + (risk * 0.8)
@@ -126,13 +133,20 @@ class BreakoutApp(EWrapper, EClient):
     def enter_trade(self, trade_type, entry_price, sl_price, tp_price, trade_result):
         order = Order()
         order.action = "BUY" if trade_type == 'long' else "SELL"
-        order.totalQuantity = 1  # Adjust for CFD contract size if needed
+        order.totalQuantity = 1  # 1 E-mini NQ contract
         order.orderType = "MKT"
         self.placeOrder(self.nextOrderId, self.contract, order)
         self.position = trade_type
         self.entry_price = entry_price
         self.sl_price = sl_price
         self.tp_price = tp_price
+        
+        trade_logger.info(f"TRADE ENTRY - Type: {trade_type.upper()}, "
+                         f"Entry Price: {entry_price:.2f}, "
+                         f"Stop Loss: {sl_price:.2f}, "
+                         f"Take Profit: {tp_price:.2f}, "
+                         f"Symbol: {self.index_symbol}M5")
+        
         logging.info(f"Entered {trade_type.upper()} at {entry_price}, SL={sl_price}, TP={tp_price}")
         print(f"Trade Entered: {trade_type.upper()} at {entry_price}, SL={sl_price}, TP={tp_price}")
         self.nextOrderId += 1
@@ -148,6 +162,14 @@ class BreakoutApp(EWrapper, EClient):
         order.orderType = "MKT"
         self.placeOrder(self.nextOrderId, self.contract, order)
         points = exit_price - self.entry_price if trade_type == 'long' else self.entry_price - exit_price
+        
+        trade_logger.info(f"TRADE EXIT - Type: {trade_type.upper()}, "
+                         f"Entry Price: {self.entry_price:.2f}, "
+                         f"Exit Price: {exit_price:.2f}, "
+                         f"Result: {result}, "
+                         f"Points: {points:.2f}, "
+                         f"Symbol: {self.index_symbol}M5")
+        
         if trade_type == 'long':
             trade_result['Long_Result'] = result
             trade_result['Long_Points'] = points
@@ -188,21 +210,22 @@ def main():
         print(f"Today ({today}) is not a trading day (e.g., weekend or holiday). Exiting.")
         return
 
-    print(f"Starting breakout strategy for NASDAQ CFD on {today}...")
-    logging.info(f"Starting breakout strategy for NASDAQ CFD on {today}")
+    print(f"Starting breakout strategy for NASDAQ Futures (NQM5) on {today}...")
+    logging.info(f"Starting breakout strategy for NASDAQ Futures (NQM5) on {today}")
 
-    app = BreakoutApp(index_symbol="NAS100", opening_time="09:30")
+    app = BreakoutApp(index_symbol="NQ", opening_time="09:30")
     app.connect("127.0.0.1", 7497, clientId=123)
     api_thread = threading.Thread(target=run_loop, args=(app,), daemon=True)
     api_thread.start()
     time.sleep(2)
 
-    # Define NASDAQ 100 CFD contract
+    # Define NASDAQ 100 Futures contract (NQM5 - June 2025)
     app.contract = Contract()
-    app.contract.symbol = app.index_symbol  # "NAS100"
-    app.contract.secType = "CFD"
-    app.contract.exchange = "SMART"
+    app.contract.symbol = app.index_symbol  # "NQ"
+    app.contract.secType = "FUT"
+    app.contract.exchange = "CME"
     app.contract.currency = "USD"
+    app.contract.lastTradeDateOrContractMonth = "20250620"  # June 20, 2025 expiration
 
     wait_for_opening_candle(app.opening_time)
 
@@ -232,13 +255,16 @@ def main():
     app.reqMktData(2, app.contract, "", False, False, [])
 
     eastern = pytz.timezone('US/Eastern')
-    print("Monitoring NASDAQ CFD for breakouts until 4:00 PM ET...")
-    while datetime.now(eastern).time() < dt_time(16, 0):
+    print("Monitoring NASDAQ Futures (NQM5) for breakouts until 4:01 PM ET...")
+    while datetime.now(eastern).time() < dt_time(16, 1):
         time.sleep(1)
 
+    # Allow time for EOD processing
+    time.sleep(10)
+
     if app.position:
-        app.exit_trade(app.position, 'EOD', app.entry_price, app.trades[-1])
-        print("Market closed. Closed open position at EOD.")
+        logging.warning("Position still open after EOD. Closing manually.")
+        print("Warning: Position still open after EOD. Please close manually.")
 
     results_df = pd.DataFrame(app.trades)
     if not results_df.empty:

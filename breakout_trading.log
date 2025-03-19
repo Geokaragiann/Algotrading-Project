@@ -1,0 +1,415 @@
+2025-03-12 15:11:24,217 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-12
+2025-03-12 15:11:24,227 - INFO - sent startApi
+2025-03-12 15:11:24,227 - INFO - REQUEST startApi {}
+2025-03-12 15:11:24,227 - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00123\x00\x00'
+2025-03-12 15:11:24,228 - INFO - ANSWER connectAck {}
+2025-03-12 15:11:24,229 - INFO - ANSWER managedAccounts {'accountsList': 'DU8386775'}
+2025-03-12 15:11:24,230 - INFO - Next valid order ID received: 1
+2025-03-12 15:11:24,230 - ERROR - Error 2104: Market data farm connection is OK:hfarm
+2025-03-12 15:11:24,230 - ERROR - Error 2104: Market data farm connection is OK:usfarm.nj
+2025-03-12 15:11:24,230 - ERROR - Error 2104: Market data farm connection is OK:jfarm
+2025-03-12 15:11:24,230 - ERROR - Error 2104: Market data farm connection is OK:usfuture
+2025-03-12 15:11:24,230 - ERROR - Error 2104: Market data farm connection is OK:cashfarm
+2025-03-12 15:11:24,230 - ERROR - Error 2104: Market data farm connection is OK:eufarmnj
+2025-03-12 15:11:24,230 - ERROR - Error 2104: Market data farm connection is OK:usfarm
+2025-03-12 15:11:24,230 - ERROR - Error 2106: HMDS data farm connection is OK:euhmds
+2025-03-12 15:11:24,230 - ERROR - Error 2106: HMDS data farm connection is OK:fundfarm
+2025-03-12 15:11:24,230 - ERROR - Error 2106: HMDS data farm connection is OK:ushmds
+2025-03-12 15:11:24,230 - ERROR - Error 2158: Sec-def data farm connection is OK:secdefil
+2025-03-12 15:11:26,265 - INFO - Waiting 33.6 minutes until 09:30 +15 minutes...
+2025-03-12 15:11:32,396 - INFO - disconnecting
+2025-03-12 15:11:32,398 - INFO - ANSWER connectionClosed {}
+2025-03-12 15:11:40,515 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-12
+2025-03-12 15:11:40,516 - ERROR - Error 502: Couldn't connect to TWS. Confirm that "Enable ActiveX and Socket EClients" 
+is enabled and connection port is the same as "Socket Port" on the 
+TWS "Edit->Global Configuration...->API->Settings" menu. Live Trading ports: 
+TWS: 7496; IB Gateway: 4001. Simulated Trading ports for new installations 
+of version 954.1 or newer:  TWS: 7497; IB Gateway: 4002
+2025-03-12 15:11:40,516 - INFO - could not connect
+2025-03-12 15:11:40,516 - INFO - disconnecting
+2025-03-12 15:11:40,516 - INFO - ANSWER connectionClosed {}
+2025-03-12 15:11:42,570 - INFO - Waiting 33.3 minutes until 09:30 +15 minutes...
+2025-03-12 15:51:59,328 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-12
+2025-03-12 15:51:59,329 - ERROR - Error 502: Couldn't connect to TWS. Confirm that "Enable ActiveX and Socket EClients" 
+is enabled and connection port is the same as "Socket Port" on the 
+TWS "Edit->Global Configuration...->API->Settings" menu. Live Trading ports: 
+TWS: 7496; IB Gateway: 4001. Simulated Trading ports for new installations 
+of version 954.1 or newer:  TWS: 7497; IB Gateway: 4002
+2025-03-12 15:51:59,329 - INFO - could not connect
+2025-03-12 15:51:59,329 - INFO - disconnecting
+2025-03-12 15:51:59,329 - INFO - ANSWER connectionClosed {}
+2025-03-12 15:52:01,381 - INFO - REQUEST reqHistoricalData {'reqId': 1, 'contract': 4694233152: 0,NAS100,CFD,,0.0,,,SMART,,USD,,,False,,combo:, 'endDateTime': '', 'durationStr': '1 D', 'barSizeSetting': '15 mins', 'whatToShow': 'TRADES', 'useRTH': 1, 'formatDate': 1, 'keepUpToDate': False, 'chartOptions': []}
+2025-03-12 15:52:01,382 - ERROR - Error 504: Not connected
+2025-03-12 15:54:18,516 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-12
+2025-03-12 15:54:18,569 - INFO - sent startApi
+2025-03-12 15:54:18,569 - INFO - REQUEST startApi {}
+2025-03-12 15:54:18,569 - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00123\x00\x00'
+2025-03-12 15:54:18,569 - INFO - ANSWER connectAck {}
+2025-03-12 15:54:19,177 - INFO - disconnecting
+2025-03-12 15:54:19,177 - INFO - ANSWER connectionClosed {}
+2025-03-12 15:54:20,622 - INFO - REQUEST reqHistoricalData {'reqId': 1, 'contract': 4836204400: 0,NAS100,CFD,,0.0,,,SMART,,USD,,,False,,combo:, 'endDateTime': '', 'durationStr': '1 D', 'barSizeSetting': '15 mins', 'whatToShow': 'TRADES', 'useRTH': 1, 'formatDate': 1, 'keepUpToDate': False, 'chartOptions': []}
+2025-03-12 15:54:20,622 - ERROR - Error 504: Not connected
+2025-03-12 15:54:30,627 - ERROR - Failed to get opening candle. Exiting.
+2025-03-12 15:54:36,876 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-12
+2025-03-12 15:54:36,882 - INFO - sent startApi
+2025-03-12 15:54:36,882 - INFO - REQUEST startApi {}
+2025-03-12 15:54:36,882 - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00123\x00\x00'
+2025-03-12 15:54:36,882 - INFO - ANSWER connectAck {}
+2025-03-12 15:54:36,897 - INFO - ANSWER managedAccounts {'accountsList': 'DU8386775'}
+2025-03-12 15:54:36,897 - INFO - Next valid order ID received: 1
+2025-03-12 15:54:36,901 - ERROR - Error 2104: Market data farm connection is OK:hfarm
+2025-03-12 15:54:36,901 - ERROR - Error 2104: Market data farm connection is OK:usfarm.nj
+2025-03-12 15:54:36,901 - ERROR - Error 2104: Market data farm connection is OK:jfarm
+2025-03-12 15:54:36,901 - ERROR - Error 2104: Market data farm connection is OK:usfuture
+2025-03-12 15:54:36,901 - ERROR - Error 2104: Market data farm connection is OK:cashfarm
+2025-03-12 15:54:36,901 - ERROR - Error 2104: Market data farm connection is OK:eufarmnj
+2025-03-12 15:54:36,901 - ERROR - Error 2104: Market data farm connection is OK:usfarm
+2025-03-12 15:54:36,901 - ERROR - Error 2106: HMDS data farm connection is OK:euhmds
+2025-03-12 15:54:36,901 - ERROR - Error 2106: HMDS data farm connection is OK:fundfarm
+2025-03-12 15:54:36,901 - ERROR - Error 2106: HMDS data farm connection is OK:ushmds
+2025-03-12 15:54:36,901 - ERROR - Error 2158: Sec-def data farm connection is OK:secdefil
+2025-03-12 15:54:38,920 - INFO - REQUEST reqHistoricalData {'reqId': 1, 'contract': 4689647264: 0,NAS100,CFD,,0.0,,,SMART,,USD,,,False,,combo:, 'endDateTime': '', 'durationStr': '1 D', 'barSizeSetting': '15 mins', 'whatToShow': 'TRADES', 'useRTH': 1, 'formatDate': 1, 'keepUpToDate': False, 'chartOptions': []}
+2025-03-12 15:54:38,920 - INFO - SENDING reqHistoricalData b'\x00\x00\x00C20\x001\x000\x00NAS100\x00CFD\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x0015 mins\x001 D\x001\x00TRADES\x001\x000\x00\x00'
+2025-03-12 15:54:39,079 - ERROR - Error 200: No security definition has been found for the request
+2025-03-12 15:54:48,923 - ERROR - Failed to get opening candle. Exiting.
+2025-03-12 15:54:48,923 - INFO - disconnecting
+2025-03-12 15:54:48,923 - INFO - ANSWER connectionClosed {}
+2025-03-12 15:54:54,763 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-12
+2025-03-12 15:54:54,768 - INFO - sent startApi
+2025-03-12 15:54:54,768 - INFO - REQUEST startApi {}
+2025-03-12 15:54:54,768 - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00123\x00\x00'
+2025-03-12 15:54:54,768 - INFO - ANSWER connectAck {}
+2025-03-12 15:54:54,770 - INFO - ANSWER managedAccounts {'accountsList': 'DU8386775'}
+2025-03-12 15:54:54,770 - INFO - Next valid order ID received: 1
+2025-03-12 15:54:54,770 - ERROR - Error 2104: Market data farm connection is OK:hfarm
+2025-03-12 15:54:54,770 - ERROR - Error 2104: Market data farm connection is OK:usfarm.nj
+2025-03-12 15:54:54,770 - ERROR - Error 2104: Market data farm connection is OK:jfarm
+2025-03-12 15:54:54,770 - ERROR - Error 2104: Market data farm connection is OK:usfuture
+2025-03-12 15:54:54,770 - ERROR - Error 2104: Market data farm connection is OK:cashfarm
+2025-03-12 15:54:54,771 - ERROR - Error 2104: Market data farm connection is OK:eufarmnj
+2025-03-12 15:54:54,771 - ERROR - Error 2104: Market data farm connection is OK:usfarm
+2025-03-12 15:54:54,771 - ERROR - Error 2106: HMDS data farm connection is OK:euhmds
+2025-03-12 15:54:54,771 - ERROR - Error 2106: HMDS data farm connection is OK:fundfarm
+2025-03-12 15:54:54,771 - ERROR - Error 2106: HMDS data farm connection is OK:ushmds
+2025-03-12 15:54:54,771 - ERROR - Error 2158: Sec-def data farm connection is OK:secdefil
+2025-03-12 15:54:56,811 - INFO - REQUEST reqHistoricalData {'reqId': 1, 'contract': 4818162352: 0,NAS100,CFD,,0.0,,,SMART,,USD,,,False,,combo:, 'endDateTime': '', 'durationStr': '1 D', 'barSizeSetting': '15 mins', 'whatToShow': 'TRADES', 'useRTH': 1, 'formatDate': 1, 'keepUpToDate': False, 'chartOptions': []}
+2025-03-12 15:54:56,811 - INFO - SENDING reqHistoricalData b'\x00\x00\x00C20\x001\x000\x00NAS100\x00CFD\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x0015 mins\x001 D\x001\x00TRADES\x001\x000\x00\x00'
+2025-03-12 15:54:56,963 - ERROR - Error 200: No security definition has been found for the request
+2025-03-12 15:55:06,816 - ERROR - Failed to get opening candle. Exiting.
+2025-03-12 15:55:06,817 - INFO - disconnecting
+2025-03-12 15:55:06,817 - INFO - ANSWER connectionClosed {}
+2025-03-12 15:55:56,022 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-12
+2025-03-12 15:55:56,036 - INFO - sent startApi
+2025-03-12 15:55:56,037 - INFO - REQUEST startApi {}
+2025-03-12 15:55:56,037 - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00123\x00\x00'
+2025-03-12 15:55:56,037 - INFO - ANSWER connectAck {}
+2025-03-12 15:55:56,041 - INFO - ANSWER managedAccounts {'accountsList': 'DU8386775'}
+2025-03-12 15:55:56,042 - INFO - Next valid order ID received: 1
+2025-03-12 15:55:56,042 - ERROR - Error 2104: Market data farm connection is OK:hfarm
+2025-03-12 15:55:56,043 - ERROR - Error 2104: Market data farm connection is OK:usfarm.nj
+2025-03-12 15:55:56,043 - ERROR - Error 2104: Market data farm connection is OK:jfarm
+2025-03-12 15:55:56,043 - ERROR - Error 2104: Market data farm connection is OK:usfuture
+2025-03-12 15:55:56,044 - ERROR - Error 2104: Market data farm connection is OK:cashfarm
+2025-03-12 15:55:56,044 - ERROR - Error 2104: Market data farm connection is OK:eufarmnj
+2025-03-12 15:55:56,044 - ERROR - Error 2104: Market data farm connection is OK:usfarm
+2025-03-12 15:55:56,044 - ERROR - Error 2106: HMDS data farm connection is OK:euhmds
+2025-03-12 15:55:56,044 - ERROR - Error 2106: HMDS data farm connection is OK:fundfarm
+2025-03-12 15:55:56,044 - ERROR - Error 2106: HMDS data farm connection is OK:ushmds
+2025-03-12 15:55:56,044 - ERROR - Error 2158: Sec-def data farm connection is OK:secdefil
+2025-03-12 15:55:58,102 - INFO - REQUEST reqHistoricalData {'reqId': 1, 'contract': 5479793328: 0,NAS100,CFD,,0.0,,,SMART,,USD,,,False,,combo:, 'endDateTime': '', 'durationStr': '1 D', 'barSizeSetting': '15 mins', 'whatToShow': 'TRADES', 'useRTH': 1, 'formatDate': 1, 'keepUpToDate': False, 'chartOptions': []}
+2025-03-12 15:55:58,102 - INFO - SENDING reqHistoricalData b'\x00\x00\x00C20\x001\x000\x00NAS100\x00CFD\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x0015 mins\x001 D\x001\x00TRADES\x001\x000\x00\x00'
+2025-03-12 15:55:58,259 - ERROR - Error 200: No security definition has been found for the request
+2025-03-12 15:56:08,107 - ERROR - Failed to get opening candle. Exiting.
+2025-03-12 15:56:08,107 - INFO - disconnecting
+2025-03-12 15:56:08,108 - INFO - ANSWER connectionClosed {}
+2025-03-12 16:00:46,856 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-12
+2025-03-12 16:00:46,867 - INFO - sent startApi
+2025-03-12 16:00:46,867 - INFO - REQUEST startApi {}
+2025-03-12 16:00:46,867 - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00123\x00\x00'
+2025-03-12 16:00:46,867 - INFO - ANSWER connectAck {}
+2025-03-12 16:00:46,869 - INFO - ANSWER managedAccounts {'accountsList': 'DU8386775'}
+2025-03-12 16:00:46,869 - INFO - Next valid order ID received: 1
+2025-03-12 16:00:46,869 - ERROR - Error 2104: Market data farm connection is OK:hfarm
+2025-03-12 16:00:46,869 - ERROR - Error 2104: Market data farm connection is OK:usfarm.nj
+2025-03-12 16:00:46,869 - ERROR - Error 2104: Market data farm connection is OK:jfarm
+2025-03-12 16:00:46,869 - ERROR - Error 2104: Market data farm connection is OK:usfuture
+2025-03-12 16:00:46,869 - ERROR - Error 2104: Market data farm connection is OK:cashfarm
+2025-03-12 16:00:46,870 - ERROR - Error 2104: Market data farm connection is OK:eufarmnj
+2025-03-12 16:00:46,870 - ERROR - Error 2104: Market data farm connection is OK:usfarm
+2025-03-12 16:00:46,870 - ERROR - Error 2106: HMDS data farm connection is OK:euhmds
+2025-03-12 16:00:46,870 - ERROR - Error 2106: HMDS data farm connection is OK:fundfarm
+2025-03-12 16:00:46,870 - ERROR - Error 2106: HMDS data farm connection is OK:ushmds
+2025-03-12 16:00:46,870 - ERROR - Error 2158: Sec-def data farm connection is OK:secdefil
+2025-03-12 16:00:48,914 - INFO - REQUEST reqHistoricalData {'reqId': 1, 'contract': 5138911920: 0,NAS100,CFD,,0.0,,,IBKRATS,,USD,,,False,,combo:, 'endDateTime': '', 'durationStr': '1 D', 'barSizeSetting': '15 mins', 'whatToShow': 'TRADES', 'useRTH': 1, 'formatDate': 1, 'keepUpToDate': False, 'chartOptions': []}
+2025-03-12 16:00:48,914 - INFO - SENDING reqHistoricalData b'\x00\x00\x00E20\x001\x000\x00NAS100\x00CFD\x00\x000.0\x00\x00\x00IBKRATS\x00\x00USD\x00\x00\x000\x00\x0015 mins\x001 D\x001\x00TRADES\x001\x000\x00\x00'
+2025-03-12 16:00:49,066 - ERROR - Error 200: No security definition has been found for the request
+2025-03-12 16:00:58,919 - ERROR - Failed to get opening candle. Exiting.
+2025-03-12 16:00:58,921 - INFO - disconnecting
+2025-03-12 16:00:58,921 - INFO - ANSWER connectionClosed {}
+2025-03-12 16:01:59,944 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-12
+2025-03-12 16:01:59,958 - INFO - sent startApi
+2025-03-12 16:01:59,958 - INFO - REQUEST startApi {}
+2025-03-12 16:01:59,959 - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00123\x00\x00'
+2025-03-12 16:01:59,959 - INFO - ANSWER connectAck {}
+2025-03-12 16:01:59,963 - INFO - ANSWER managedAccounts {'accountsList': 'DU8386775'}
+2025-03-12 16:01:59,963 - INFO - Next valid order ID received: 1
+2025-03-12 16:01:59,963 - ERROR - Error 2104: Market data farm connection is OK:hfarm
+2025-03-12 16:01:59,964 - ERROR - Error 2104: Market data farm connection is OK:usfarm.nj
+2025-03-12 16:01:59,964 - ERROR - Error 2104: Market data farm connection is OK:jfarm
+2025-03-12 16:01:59,964 - ERROR - Error 2104: Market data farm connection is OK:usfuture
+2025-03-12 16:01:59,964 - ERROR - Error 2104: Market data farm connection is OK:cashfarm
+2025-03-12 16:01:59,964 - ERROR - Error 2104: Market data farm connection is OK:eufarmnj
+2025-03-12 16:01:59,964 - ERROR - Error 2104: Market data farm connection is OK:usfarm
+2025-03-12 16:01:59,964 - ERROR - Error 2106: HMDS data farm connection is OK:euhmds
+2025-03-12 16:01:59,964 - ERROR - Error 2106: HMDS data farm connection is OK:fundfarm
+2025-03-12 16:01:59,964 - ERROR - Error 2106: HMDS data farm connection is OK:ushmds
+2025-03-12 16:01:59,964 - ERROR - Error 2158: Sec-def data farm connection is OK:secdefil
+2025-03-12 16:02:01,998 - INFO - REQUEST reqHistoricalData {'reqId': 1, 'contract': 4655628976: 0,NAS100,CFD,,0.0,,,SMART,,USD,,,False,,combo:, 'endDateTime': '', 'durationStr': '1 D', 'barSizeSetting': '15 mins', 'whatToShow': 'TRADES', 'useRTH': 1, 'formatDate': 1, 'keepUpToDate': False, 'chartOptions': []}
+2025-03-12 16:02:01,998 - INFO - SENDING reqHistoricalData b'\x00\x00\x00C20\x001\x000\x00NAS100\x00CFD\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x0015 mins\x001 D\x001\x00TRADES\x001\x000\x00\x00'
+2025-03-12 16:02:02,150 - ERROR - Error 200: No security definition has been found for the request
+2025-03-12 16:02:12,003 - ERROR - Failed to get opening candle. Exiting.
+2025-03-12 16:02:12,004 - INFO - disconnecting
+2025-03-12 16:02:12,004 - INFO - ANSWER connectionClosed {}
+2025-03-12 16:02:14,767 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-12
+2025-03-12 16:02:14,773 - INFO - sent startApi
+2025-03-12 16:02:14,774 - INFO - REQUEST startApi {}
+2025-03-12 16:02:14,774 - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00123\x00\x00'
+2025-03-12 16:02:14,774 - INFO - ANSWER connectAck {}
+2025-03-12 16:02:14,792 - INFO - ANSWER managedAccounts {'accountsList': 'DU8386775'}
+2025-03-12 16:02:14,792 - INFO - Next valid order ID received: 1
+2025-03-12 16:02:14,792 - ERROR - Error 2104: Market data farm connection is OK:hfarm
+2025-03-12 16:02:14,793 - ERROR - Error 2104: Market data farm connection is OK:usfarm.nj
+2025-03-12 16:02:14,794 - ERROR - Error 2104: Market data farm connection is OK:jfarm
+2025-03-12 16:02:14,794 - ERROR - Error 2104: Market data farm connection is OK:usfuture
+2025-03-12 16:02:14,794 - ERROR - Error 2104: Market data farm connection is OK:cashfarm
+2025-03-12 16:02:14,794 - ERROR - Error 2104: Market data farm connection is OK:eufarmnj
+2025-03-12 16:02:14,794 - ERROR - Error 2104: Market data farm connection is OK:usfarm
+2025-03-12 16:02:14,794 - ERROR - Error 2106: HMDS data farm connection is OK:euhmds
+2025-03-12 16:02:14,794 - ERROR - Error 2106: HMDS data farm connection is OK:fundfarm
+2025-03-12 16:02:14,795 - ERROR - Error 2106: HMDS data farm connection is OK:ushmds
+2025-03-12 16:02:14,795 - ERROR - Error 2158: Sec-def data farm connection is OK:secdefil
+2025-03-12 16:02:16,811 - INFO - REQUEST reqHistoricalData {'reqId': 1, 'contract': 5068767920: 0,NAS100,CFD,,0.0,,,IDEALPRO,,USD,,,False,,combo:, 'endDateTime': '', 'durationStr': '1 D', 'barSizeSetting': '15 mins', 'whatToShow': 'TRADES', 'useRTH': 1, 'formatDate': 1, 'keepUpToDate': False, 'chartOptions': []}
+2025-03-12 16:02:16,811 - INFO - SENDING reqHistoricalData b'\x00\x00\x00F20\x001\x000\x00NAS100\x00CFD\x00\x000.0\x00\x00\x00IDEALPRO\x00\x00USD\x00\x00\x000\x00\x0015 mins\x001 D\x001\x00TRADES\x001\x000\x00\x00'
+2025-03-12 16:02:16,964 - ERROR - Error 200: No security definition has been found for the request
+2025-03-12 16:02:26,816 - ERROR - Failed to get opening candle. Exiting.
+2025-03-12 16:02:26,819 - INFO - disconnecting
+2025-03-12 16:02:26,819 - INFO - ANSWER connectionClosed {}
+2025-03-12 16:03:24,068 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-12
+2025-03-12 16:03:24,109 - INFO - sent startApi
+2025-03-12 16:03:24,109 - INFO - REQUEST startApi {}
+2025-03-12 16:03:24,109 - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00123\x00\x00'
+2025-03-12 16:03:24,109 - INFO - ANSWER connectAck {}
+2025-03-12 16:03:24,125 - INFO - Next valid order ID received: 1
+2025-03-12 16:03:24,125 - INFO - ANSWER managedAccounts {'accountsList': 'DU8386775'}
+2025-03-12 16:03:24,126 - ERROR - Error 2104: Market data farm connection is OK:hfarm
+2025-03-12 16:03:24,126 - ERROR - Error 2104: Market data farm connection is OK:usfarm.nj
+2025-03-12 16:03:24,127 - ERROR - Error 2104: Market data farm connection is OK:jfarm
+2025-03-12 16:03:24,127 - ERROR - Error 2104: Market data farm connection is OK:usfuture
+2025-03-12 16:03:24,127 - ERROR - Error 2104: Market data farm connection is OK:cashfarm
+2025-03-12 16:03:24,127 - ERROR - Error 2104: Market data farm connection is OK:eufarmnj
+2025-03-12 16:03:24,128 - ERROR - Error 2104: Market data farm connection is OK:usfarm
+2025-03-12 16:03:24,128 - ERROR - Error 2106: HMDS data farm connection is OK:euhmds
+2025-03-12 16:03:24,128 - ERROR - Error 2106: HMDS data farm connection is OK:fundfarm
+2025-03-12 16:03:24,128 - ERROR - Error 2106: HMDS data farm connection is OK:ushmds
+2025-03-12 16:03:24,128 - ERROR - Error 2158: Sec-def data farm connection is OK:secdefil
+2025-03-12 16:03:26,159 - INFO - REQUEST reqHistoricalData {'reqId': 1, 'contract': 5096820448: 0,NAS100,CFD,,0.0,,,SMART,,USD,,,False,,combo:, 'endDateTime': '', 'durationStr': '1 D', 'barSizeSetting': '15 mins', 'whatToShow': 'TRADES', 'useRTH': 1, 'formatDate': 1, 'keepUpToDate': False, 'chartOptions': []}
+2025-03-12 16:03:26,159 - INFO - SENDING reqHistoricalData b'\x00\x00\x00C20\x001\x000\x00NAS100\x00CFD\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x0015 mins\x001 D\x001\x00TRADES\x001\x000\x00\x00'
+2025-03-12 16:03:26,313 - ERROR - Error 200: No security definition has been found for the request
+2025-03-12 16:03:36,162 - ERROR - Failed to get opening candle. Exiting.
+2025-03-12 16:03:36,165 - INFO - disconnecting
+2025-03-12 16:03:36,165 - INFO - ANSWER connectionClosed {}
+2025-03-12 16:04:42,311 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-12
+2025-03-12 16:04:42,317 - INFO - sent startApi
+2025-03-12 16:04:42,317 - INFO - REQUEST startApi {}
+2025-03-12 16:04:42,317 - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00123\x00\x00'
+2025-03-12 16:04:42,318 - INFO - ANSWER connectAck {}
+2025-03-12 16:04:42,320 - INFO - ANSWER managedAccounts {'accountsList': 'DU8386775'}
+2025-03-12 16:04:42,320 - INFO - Next valid order ID received: 1
+2025-03-12 16:04:42,320 - ERROR - Error 2104: Market data farm connection is OK:hfarm
+2025-03-12 16:04:42,320 - ERROR - Error 2104: Market data farm connection is OK:usfarm.nj
+2025-03-12 16:04:42,320 - ERROR - Error 2104: Market data farm connection is OK:jfarm
+2025-03-12 16:04:42,320 - ERROR - Error 2104: Market data farm connection is OK:usfuture
+2025-03-12 16:04:42,320 - ERROR - Error 2104: Market data farm connection is OK:cashfarm
+2025-03-12 16:04:42,320 - ERROR - Error 2104: Market data farm connection is OK:eufarmnj
+2025-03-12 16:04:42,320 - ERROR - Error 2104: Market data farm connection is OK:usfarm
+2025-03-12 16:04:42,320 - ERROR - Error 2106: HMDS data farm connection is OK:euhmds
+2025-03-12 16:04:42,320 - ERROR - Error 2106: HMDS data farm connection is OK:fundfarm
+2025-03-12 16:04:42,320 - ERROR - Error 2106: HMDS data farm connection is OK:ushmds
+2025-03-12 16:04:42,320 - ERROR - Error 2158: Sec-def data farm connection is OK:secdefil
+2025-03-12 16:04:44,357 - INFO - REQUEST reqHistoricalData {'reqId': 1, 'contract': 4860632176: 0,NAS100,FUT,,0.0,,,SMART,,USD,,,False,,combo:, 'endDateTime': '', 'durationStr': '1 D', 'barSizeSetting': '15 mins', 'whatToShow': 'TRADES', 'useRTH': 1, 'formatDate': 1, 'keepUpToDate': False, 'chartOptions': []}
+2025-03-12 16:04:44,357 - INFO - SENDING reqHistoricalData b'\x00\x00\x00C20\x001\x000\x00NAS100\x00FUT\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x0015 mins\x001 D\x001\x00TRADES\x001\x000\x00\x00'
+2025-03-12 16:04:44,359 - ERROR - Error 321: Error validating request.-'bK' : cause - Please enter a local symbol or an expiry
+2025-03-12 16:04:54,359 - ERROR - Failed to get opening candle. Exiting.
+2025-03-12 16:04:54,360 - INFO - disconnecting
+2025-03-12 16:04:54,360 - INFO - ANSWER connectionClosed {}
+2025-03-12 16:06:37,073 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-12
+2025-03-12 16:06:37,080 - INFO - sent startApi
+2025-03-12 16:06:37,081 - INFO - REQUEST startApi {}
+2025-03-12 16:06:37,081 - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00123\x00\x00'
+2025-03-12 16:06:37,081 - INFO - ANSWER connectAck {}
+2025-03-12 16:06:37,083 - INFO - ANSWER managedAccounts {'accountsList': 'DU8386775'}
+2025-03-12 16:06:37,083 - INFO - Next valid order ID received: 1
+2025-03-12 16:06:37,083 - ERROR - Error 2104: Market data farm connection is OK:hfarm
+2025-03-12 16:06:37,083 - ERROR - Error 2104: Market data farm connection is OK:usfarm.nj
+2025-03-12 16:06:37,083 - ERROR - Error 2104: Market data farm connection is OK:jfarm
+2025-03-12 16:06:37,083 - ERROR - Error 2104: Market data farm connection is OK:usfuture
+2025-03-12 16:06:37,083 - ERROR - Error 2104: Market data farm connection is OK:cashfarm
+2025-03-12 16:06:37,083 - ERROR - Error 2104: Market data farm connection is OK:eufarmnj
+2025-03-12 16:06:37,083 - ERROR - Error 2104: Market data farm connection is OK:usfarm
+2025-03-12 16:06:37,083 - ERROR - Error 2106: HMDS data farm connection is OK:euhmds
+2025-03-12 16:06:37,084 - ERROR - Error 2106: HMDS data farm connection is OK:fundfarm
+2025-03-12 16:06:37,084 - ERROR - Error 2106: HMDS data farm connection is OK:ushmds
+2025-03-12 16:06:37,084 - ERROR - Error 2158: Sec-def data farm connection is OK:secdefil
+2025-03-12 16:06:39,128 - INFO - REQUEST reqHistoricalData {'reqId': 1, 'contract': 4669000816: 0,NQ,FUT,,0.0,,,SMART,,USD,,,False,,combo:, 'endDateTime': '', 'durationStr': '1 D', 'barSizeSetting': '15 mins', 'whatToShow': 'TRADES', 'useRTH': 1, 'formatDate': 1, 'keepUpToDate': False, 'chartOptions': []}
+2025-03-12 16:06:39,128 - INFO - SENDING reqHistoricalData b'\x00\x00\x00?20\x001\x000\x00NQ\x00FUT\x00\x000.0\x00\x00\x00SMART\x00\x00USD\x00\x00\x000\x00\x0015 mins\x001 D\x001\x00TRADES\x001\x000\x00\x00'
+2025-03-12 16:06:39,130 - ERROR - Error 321: Error validating request.-'bK' : cause - Please enter a local symbol or an expiry
+2025-03-12 16:06:49,133 - ERROR - Failed to get opening candle. Exiting.
+2025-03-12 16:06:49,135 - INFO - disconnecting
+2025-03-12 16:06:49,136 - INFO - ANSWER connectionClosed {}
+2025-03-12 16:07:41,183 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-12
+2025-03-12 16:07:41,191 - INFO - sent startApi
+2025-03-12 16:07:41,191 - INFO - REQUEST startApi {}
+2025-03-12 16:07:41,191 - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00123\x00\x00'
+2025-03-12 16:07:41,191 - INFO - ANSWER connectAck {}
+2025-03-12 16:07:41,195 - INFO - ANSWER managedAccounts {'accountsList': 'DU8386775'}
+2025-03-12 16:07:41,195 - INFO - Next valid order ID received: 1
+2025-03-12 16:07:41,195 - ERROR - Error 2104: Market data farm connection is OK:hfarm
+2025-03-12 16:07:41,195 - ERROR - Error 2104: Market data farm connection is OK:usfarm.nj
+2025-03-12 16:07:41,195 - ERROR - Error 2104: Market data farm connection is OK:jfarm
+2025-03-12 16:07:41,195 - ERROR - Error 2104: Market data farm connection is OK:usfuture
+2025-03-12 16:07:41,195 - ERROR - Error 2104: Market data farm connection is OK:cashfarm
+2025-03-12 16:07:41,195 - ERROR - Error 2104: Market data farm connection is OK:eufarmnj
+2025-03-12 16:07:41,195 - ERROR - Error 2104: Market data farm connection is OK:usfarm
+2025-03-12 16:07:41,196 - ERROR - Error 2106: HMDS data farm connection is OK:euhmds
+2025-03-12 16:07:41,196 - ERROR - Error 2106: HMDS data farm connection is OK:fundfarm
+2025-03-12 16:07:41,196 - ERROR - Error 2106: HMDS data farm connection is OK:ushmds
+2025-03-12 16:07:41,196 - ERROR - Error 2158: Sec-def data farm connection is OK:secdefil
+2025-03-12 16:07:43,238 - INFO - REQUEST reqHistoricalData {'reqId': 1, 'contract': 4993270448: 0,NQ,FUT,,0.0,,,CME,,USD,,,False,,combo:, 'endDateTime': '', 'durationStr': '1 D', 'barSizeSetting': '15 mins', 'whatToShow': 'TRADES', 'useRTH': 1, 'formatDate': 1, 'keepUpToDate': False, 'chartOptions': []}
+2025-03-12 16:07:43,238 - INFO - SENDING reqHistoricalData b'\x00\x00\x00=20\x001\x000\x00NQ\x00FUT\x00\x000.0\x00\x00\x00CME\x00\x00USD\x00\x00\x000\x00\x0015 mins\x001 D\x001\x00TRADES\x001\x000\x00\x00'
+2025-03-12 16:07:43,240 - ERROR - Error 321: Error validating request.-'bK' : cause - Please enter a local symbol or an expiry
+2025-03-12 16:07:53,244 - ERROR - Failed to get opening candle. Exiting.
+2025-03-12 16:07:53,246 - INFO - disconnecting
+2025-03-12 16:07:53,247 - INFO - ANSWER connectionClosed {}
+2025-03-12 16:12:04,705 - INFO - Starting breakout strategy for NASDAQ futures on 2025-03-12
+2025-03-12 16:12:04,714 - INFO - sent startApi
+2025-03-12 16:12:04,714 - INFO - REQUEST startApi {}
+2025-03-12 16:12:04,714 - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00123\x00\x00'
+2025-03-12 16:12:04,714 - INFO - ANSWER connectAck {}
+2025-03-12 16:12:04,720 - INFO - Next valid order ID received: 1
+2025-03-12 16:12:04,721 - INFO - ANSWER managedAccounts {'accountsList': 'DU8386775'}
+2025-03-12 16:12:04,721 - ERROR - Error 2104: Market data farm connection is OK:hfarm
+2025-03-12 16:12:04,721 - ERROR - Error 2104: Market data farm connection is OK:usfarm.nj
+2025-03-12 16:12:04,721 - ERROR - Error 2104: Market data farm connection is OK:jfarm
+2025-03-12 16:12:04,721 - ERROR - Error 2104: Market data farm connection is OK:usfuture
+2025-03-12 16:12:04,721 - ERROR - Error 2104: Market data farm connection is OK:cashfarm
+2025-03-12 16:12:04,721 - ERROR - Error 2104: Market data farm connection is OK:eufarmnj
+2025-03-12 16:12:04,721 - ERROR - Error 2104: Market data farm connection is OK:usfarm
+2025-03-12 16:12:04,721 - ERROR - Error 2106: HMDS data farm connection is OK:euhmds
+2025-03-12 16:12:04,721 - ERROR - Error 2106: HMDS data farm connection is OK:fundfarm
+2025-03-12 16:12:04,721 - ERROR - Error 2106: HMDS data farm connection is OK:ushmds
+2025-03-12 16:12:04,721 - ERROR - Error 2158: Sec-def data farm connection is OK:secdefil
+2025-03-12 16:12:06,763 - INFO - REQUEST reqHistoricalData {'reqId': 1, 'contract': 5275024976: 0,NQ,FUT,202503,0.0,,,CME,,USD,,,False,,combo:, 'endDateTime': '', 'durationStr': '1 D', 'barSizeSetting': '15 mins', 'whatToShow': 'TRADES', 'useRTH': 1, 'formatDate': 1, 'keepUpToDate': False, 'chartOptions': []}
+2025-03-12 16:12:06,763 - INFO - SENDING reqHistoricalData b'\x00\x00\x00C20\x001\x000\x00NQ\x00FUT\x00202503\x000.0\x00\x00\x00CME\x00\x00USD\x00\x00\x000\x00\x0015 mins\x001 D\x001\x00TRADES\x001\x000\x00\x00'
+2025-03-12 16:12:07,274 - INFO - Historical data retrieval complete
+2025-03-12 16:12:07,275 - WARNING - Opening candle not found.
+2025-03-12 16:12:16,767 - ERROR - Failed to get opening candle. Exiting.
+2025-03-12 16:12:16,767 - INFO - disconnecting
+2025-03-12 16:12:16,768 - INFO - ANSWER connectionClosed {}
+2025-03-12 16:14:35,347 - INFO - Starting breakout strategy for NASDAQ Futures on 2025-03-12
+2025-03-12 16:14:35,361 - INFO - sent startApi
+2025-03-12 16:14:35,362 - INFO - REQUEST startApi {}
+2025-03-12 16:14:35,362 - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00123\x00\x00'
+2025-03-12 16:14:35,362 - INFO - ANSWER connectAck {}
+2025-03-12 16:31:22,184 - INFO - Starting breakout strategy for NASDAQ Futures on 2025-03-12
+2025-03-12 16:31:22,189 - INFO - sent startApi
+2025-03-12 16:31:22,189 - INFO - REQUEST startApi {}
+2025-03-12 16:31:22,189 - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00123\x00\x00'
+2025-03-12 16:31:22,189 - INFO - ANSWER connectAck {}
+2025-03-12 16:31:22,191 - INFO - ANSWER managedAccounts {'accountsList': 'DU8386775'}
+2025-03-12 16:31:22,191 - INFO - Next valid order ID received: 1
+2025-03-12 16:31:22,191 - ERROR - Error 2104: Market data farm connection is OK:hfarm
+2025-03-12 16:31:22,191 - ERROR - Error 2104: Market data farm connection is OK:usfarm.nj
+2025-03-12 16:31:22,191 - ERROR - Error 2104: Market data farm connection is OK:jfarm
+2025-03-12 16:31:22,191 - ERROR - Error 2104: Market data farm connection is OK:usfuture
+2025-03-12 16:31:22,191 - ERROR - Error 2104: Market data farm connection is OK:cashfarm
+2025-03-12 16:31:22,191 - ERROR - Error 2104: Market data farm connection is OK:eufarmnj
+2025-03-12 16:31:22,191 - ERROR - Error 2104: Market data farm connection is OK:usfarm
+2025-03-12 16:31:22,191 - ERROR - Error 2106: HMDS data farm connection is OK:euhmds
+2025-03-12 16:31:22,191 - ERROR - Error 2106: HMDS data farm connection is OK:fundfarm
+2025-03-12 16:31:22,191 - ERROR - Error 2106: HMDS data farm connection is OK:ushmds
+2025-03-12 16:31:22,191 - ERROR - Error 2158: Sec-def data farm connection is OK:secdefil
+2025-03-12 16:31:24,239 - INFO - REQUEST reqHistoricalData {'reqId': 1, 'contract': 4970085920: 0,NQ,FUT,,0.0,,,CME,,USD,,,False,,combo:, 'endDateTime': '', 'durationStr': '1 D', 'barSizeSetting': '15 mins', 'whatToShow': 'TRADES', 'useRTH': 1, 'formatDate': 1, 'keepUpToDate': False, 'chartOptions': []}
+2025-03-12 16:31:24,239 - INFO - SENDING reqHistoricalData b'\x00\x00\x00=20\x001\x000\x00NQ\x00FUT\x00\x000.0\x00\x00\x00CME\x00\x00USD\x00\x00\x000\x00\x0015 mins\x001 D\x001\x00TRADES\x001\x000\x00\x00'
+2025-03-12 16:31:24,241 - ERROR - Error 321: Error validating request.-'bK' : cause - Please enter a local symbol or an expiry
+2025-03-12 16:31:34,244 - ERROR - Failed to get opening candle. Exiting.
+2025-03-12 16:31:34,246 - INFO - disconnecting
+2025-03-12 16:31:34,246 - INFO - ANSWER connectionClosed {}
+2025-03-19 12:56:40,647 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-19
+2025-03-19 12:56:40,648 - ERROR - Error 502: Couldn't connect to TWS. Confirm that "Enable ActiveX and Socket EClients" 
+is enabled and connection port is the same as "Socket Port" on the 
+TWS "Edit->Global Configuration...->API->Settings" menu. Live Trading ports: 
+TWS: 7496; IB Gateway: 4001. Simulated Trading ports for new installations 
+of version 954.1 or newer:  TWS: 7497; IB Gateway: 4002
+2025-03-19 12:56:40,648 - INFO - could not connect
+2025-03-19 12:56:40,648 - INFO - disconnecting
+2025-03-19 12:56:40,648 - INFO - ANSWER connectionClosed {}
+2025-03-19 12:56:42,702 - INFO - Waiting 168.3 minutes until 09:30 +15 minutes...
+2025-03-19 13:03:17,056 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-19
+2025-03-19 13:03:17,056 - ERROR - Error 502: Couldn't connect to TWS. Confirm that "Enable ActiveX and Socket EClients" 
+is enabled and connection port is the same as "Socket Port" on the 
+TWS "Edit->Global Configuration...->API->Settings" menu. Live Trading ports: 
+TWS: 7496; IB Gateway: 4001. Simulated Trading ports for new installations 
+of version 954.1 or newer:  TWS: 7497; IB Gateway: 4002
+2025-03-19 13:03:17,056 - INFO - could not connect
+2025-03-19 13:03:17,056 - INFO - disconnecting
+2025-03-19 13:03:17,056 - INFO - ANSWER connectionClosed {}
+2025-03-19 13:03:19,116 - INFO - Waiting 161.7 minutes until 09:30 +15 minutes...
+2025-03-19 13:13:30,805 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-19
+2025-03-19 13:13:30,806 - ERROR - Error 502: Couldn't connect to TWS. Confirm that "Enable ActiveX and Socket EClients" 
+is enabled and connection port is the same as "Socket Port" on the 
+TWS "Edit->Global Configuration...->API->Settings" menu. Live Trading ports: 
+TWS: 7496; IB Gateway: 4001. Simulated Trading ports for new installations 
+of version 954.1 or newer:  TWS: 7497; IB Gateway: 4002
+2025-03-19 13:13:30,806 - INFO - could not connect
+2025-03-19 13:13:30,806 - INFO - disconnecting
+2025-03-19 13:13:30,806 - INFO - ANSWER connectionClosed {}
+2025-03-19 13:13:32,857 - INFO - Waiting 151.5 minutes until 09:30 +15 minutes...
+2025-03-19 14:02:39,688 - INFO - Starting breakout strategy for NASDAQ CFD on 2025-03-19
+2025-03-19 14:02:39,688 - ERROR - Error 502: Couldn't connect to TWS. Confirm that "Enable ActiveX and Socket EClients" 
+is enabled and connection port is the same as "Socket Port" on the 
+TWS "Edit->Global Configuration...->API->Settings" menu. Live Trading ports: 
+TWS: 7496; IB Gateway: 4001. Simulated Trading ports for new installations 
+of version 954.1 or newer:  TWS: 7497; IB Gateway: 4002
+2025-03-19 14:02:39,688 - INFO - could not connect
+2025-03-19 14:02:39,688 - INFO - disconnecting
+2025-03-19 14:02:39,688 - INFO - ANSWER connectionClosed {}
+2025-03-19 14:02:41,745 - INFO - Waiting 102.3 minutes until 09:30 +15 minutes...
+2025-03-19 14:03:06,371 - INFO - Starting breakout strategy for NASDAQ Futures (NQM5) on 2025-03-19
+2025-03-19 14:03:06,371 - ERROR - Error 502: Couldn't connect to TWS. Confirm that "Enable ActiveX and Socket EClients" 
+is enabled and connection port is the same as "Socket Port" on the 
+TWS "Edit->Global Configuration...->API->Settings" menu. Live Trading ports: 
+TWS: 7496; IB Gateway: 4001. Simulated Trading ports for new installations 
+of version 954.1 or newer:  TWS: 7497; IB Gateway: 4002
+2025-03-19 14:03:06,371 - INFO - could not connect
+2025-03-19 14:03:06,371 - INFO - disconnecting
+2025-03-19 14:03:06,371 - INFO - ANSWER connectionClosed {}
+2025-03-19 14:03:08,424 - INFO - Waiting 101.9 minutes until 09:30 +15 minutes...
+2025-03-19 14:05:43,660 - INFO - Starting breakout strategy for NASDAQ Futures (NQM5) on 2025-03-19
+2025-03-19 14:05:43,692 - INFO - sent startApi
+2025-03-19 14:05:43,692 - INFO - REQUEST startApi {}
+2025-03-19 14:05:43,692 - INFO - SENDING startApi b'\x00\x00\x00\n71\x002\x00123\x00\x00'
+2025-03-19 14:05:43,692 - INFO - ANSWER connectAck {}
+2025-03-19 14:05:43,702 - INFO - ANSWER managedAccounts {'accountsList': 'DU8386775'}
+2025-03-19 14:05:43,703 - INFO - Next valid order ID received: 1
+2025-03-19 14:05:43,704 - ERROR - Error 2104: Market data farm connection is OK:hfarm
+2025-03-19 14:05:43,704 - ERROR - Error 2104: Market data farm connection is OK:usfarm.nj
+2025-03-19 14:05:43,704 - ERROR - Error 2104: Market data farm connection is OK:jfarm
+2025-03-19 14:05:43,704 - ERROR - Error 2104: Market data farm connection is OK:usfuture
+2025-03-19 14:05:43,704 - ERROR - Error 2104: Market data farm connection is OK:cashfarm
+2025-03-19 14:05:43,704 - ERROR - Error 2104: Market data farm connection is OK:eufarmnj
+2025-03-19 14:05:43,704 - ERROR - Error 2104: Market data farm connection is OK:usfarm
+2025-03-19 14:05:43,704 - ERROR - Error 2106: HMDS data farm connection is OK:euhmds
+2025-03-19 14:05:43,704 - ERROR - Error 2106: HMDS data farm connection is OK:fundfarm
+2025-03-19 14:05:43,704 - ERROR - Error 2106: HMDS data farm connection is OK:ushmds
+2025-03-19 14:05:43,704 - ERROR - Error 2158: Sec-def data farm connection is OK:secdefil
+2025-03-19 14:05:45,719 - INFO - Waiting 99.2 minutes until 09:30 +15 minutes...
