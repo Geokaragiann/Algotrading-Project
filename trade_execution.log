@@ -100,3 +100,9 @@
 2025-03-20 16:17:00,398 - TRADE ENTRY - Type: LONG, Entry Price: 19780.75, Stop Loss: 19761.00, Take Profit: 19790.15, Symbol: NQH5, Order ID: 1
 2025-03-20 16:20:31,234 - TRADE ENTRY - Type: LONG, Entry Price: 19780.75, Stop Loss: 19761.00, Take Profit: 19790.15, Symbol: NQH5, Order ID: 1
 2025-03-20 16:22:19,064 - TRADE ENTRY - Type: LONG, Entry Price: 19780.75, Stop Loss: 19761.00, Take Profit: 19790.15, Symbol: NQH5, Order ID: 2
+2025-03-21 15:45:23,760 - TRADE ENTRY - Type: SHORT, Entry Price: 19455.50, Stop Loss: 19528.75, Take Profit: 19403.30, Symbol: NQH5, Order ID: 1
+2025-03-21 15:47:04,866 - TRADE ENTRY - Type: SHORT, Entry Price: 19455.50, Stop Loss: 19528.75, Take Profit: 19403.30, Symbol: NQH5, Order ID: 2
+2025-03-21 15:50:35,989 - TRADE ENTRY - Type: SHORT, Entry Price: 19455.50, Stop Loss: 19528.75, Take Profit: 19403.30, Symbol: NQH5, Order ID: 1
+2025-03-21 16:01:44,196 - TRADE ENTRY - Type: LONG, Entry Price: 19726.00, Stop Loss: 19652.00, Take Profit: 19778.80, Symbol: NQM5, Order ID: 2
+2025-03-21 16:01:45,526 - TRADE EXECUTED - Type: LONG, Entry Price: 19708.50, Order ID: 2
+2025-03-21 16:01:51,450 - TRADE EXECUTED - Type: LONG, Entry Price: 19708.50, Order ID: 2

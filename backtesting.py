@@ -146,7 +146,7 @@ def run_backtest(index_symbol='^IXIC', opening_time='14:45'):
         opening_time (str): Time of the opening candle in 'HH:MM' format (e.g., '14:45').
     """
     # Set date range to include recent data
-    start_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+    start_date = (datetime.now() - timedelta(days=55)).strftime('%Y-%m-%d')
     end_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
     
     print(f"Fetching data for {index_symbol} from {start_date} to {end_date}...")
