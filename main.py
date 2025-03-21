@@ -113,10 +113,12 @@ class BreakoutApp(EWrapper, EClient):
         }
 
         if self.position is None and not self.active_orders:
-            if price > opening_high - 5:
+            if price > opening_high + 5:
                 self.enter_trade('long', opening_high, long_sl, long_tp, trade_result)
-            elif price < opening_low + 5:
+            elif price < opening_low - 5:
                 self.enter_trade('short', opening_low, short_sl, short_tp, trade_result)
+            else:
+                logging.info(f"No trade triggered: Price={price}, Long Trigger={opening_high + 5}, Short Trigger={opening_low - 5}")
         elif self.position == 'long' and len(self.active_orders) < 2:
             if price <= self.sl_price:
                 self.exit_trade('long', 'SL Hit', self.sl_price, trade_result)
@@ -136,9 +138,8 @@ class BreakoutApp(EWrapper, EClient):
         order = Order()
         order.action = "BUY" if trade_type == 'long' else "SELL"
         order.totalQuantity = 1
-        order.orderType = "LMT"
-        order.lmtPrice = entry_price
-        order.eTradeOnly = False  # Explicitly disable unsupported attribute
+        order.orderType = "MKT"  # Use market order to avoid rejection
+        order.eTradeOnly = False
         order.firmQuoteOnly = False
         orderId = self.nextOrderId
         self.placeOrder(orderId, self.contract, order)
@@ -148,13 +149,21 @@ class BreakoutApp(EWrapper, EClient):
                          f"Entry Price: {entry_price:.2f}, "
                          f"Stop Loss: {sl_price:.2f}, "
                          f"Take Profit: {tp_price:.2f}, "
-                         f"Symbol: {self.index_symbol}H5, Order ID: {orderId}")
-        print(f"Limit Order Placed: {trade_type.upper()} at {entry_price}, SL={sl_price}, TP={tp_price}, Order ID={orderId}")
+                         f"Symbol: {self.index_symbol}M5, Order ID: {orderId}")  # Updated to NQM5
+        print(f"Market Order Placed: {trade_type.upper()} at market price, SL={sl_price}, TP={tp_price}, Order ID={orderId}")
         self.nextOrderId += 1
         if trade_type == 'long':
             trade_result['Long_Result'] = 'Triggered'
+            self.position = 'long'
+            self.entry_price = entry_price
+            self.sl_price = sl_price
+            self.tp_price = tp_price
         else:
             trade_result['Short_Result'] = 'Triggered'
+            self.position = 'short'
+            self.entry_price = entry_price
+            self.sl_price = sl_price
+            self.tp_price = tp_price
 
     def exit_trade(self, trade_type, result, exit_price, trade_result):
         if any(status == 'Submitted' for status in self.active_orders.values()):
@@ -162,9 +171,8 @@ class BreakoutApp(EWrapper, EClient):
         order = Order()
         order.action = "SELL" if trade_type == 'long' else "BUY"
         order.totalQuantity = 1
-        order.orderType = "LMT"
-        order.lmtPrice = exit_price
-        order.eTradeOnly = False  # Explicitly disable unsupported attribute
+        order.orderType = "MKT"  # Use market order for exit
+        order.eTradeOnly = False
         order.firmQuoteOnly = False
         orderId = self.nextOrderId
         self.placeOrder(orderId, self.contract, order)
@@ -174,42 +182,55 @@ class BreakoutApp(EWrapper, EClient):
                          f"Entry Price: {self.entry_price:.2f}, "
                          f"Exit Price: {exit_price:.2f}, "
                          f"Result: {result}, "
-                         f"Symbol: {self.index_symbol}H5, Order ID: {orderId}")
-        print(f"Limit Order Placed to Exit: {trade_type.upper()} at {exit_price}, Result={result}, Order ID={orderId}")
+                         f"Symbol: {self.index_symbol}M5, Order ID: {orderId}")  # Updated to NQM5
+        print(f"Market Order Placed to Exit: {trade_type.upper()} at market price, Result={result}, Order ID={orderId}")
         self.nextOrderId += 1
+
+        # Update trade result with points
+        points = exit_price - self.entry_price if trade_type == 'long' else self.entry_price - exit_price
+        if trade_type == 'long':
+            trade_result['Long_Result'] = result
+            trade_result['Long_Points'] = points
+        else:
+            trade_result['Short_Result'] = result
+            trade_result['Short_Points'] = points
+        self.trades.append(trade_result)
+        self.position = None
+        self.entry_price = None
+        self.sl_price = None
+        self.tp_price = None
 
     def orderStatus(self, orderId, status, filled, remaining, avgFillPrice, permId, parentId, lastFillPrice, clientId, whyHeld, mktCapPrice):
         logging.info(f"Order Status - ID: {orderId}, Status: {status}, Filled: {filled}, Avg Fill Price: {avgFillPrice}")
         if orderId in self.active_orders:
             self.active_orders[orderId] = status
             if status == "Filled" and filled > 0:
-                if self.position:
-                    entry_order_id = min(self.active_orders.keys())  # First order is entry
-                    if orderId == entry_order_id:
-                        self.position = 'long' if self.active_orders[orderId] == 'Submitted' else 'short'
-                        self.entry_price = lastFillPrice
-                        trade_logger.info(f"TRADE EXECUTED - Type: {self.position.upper()}, "
-                                         f"Entry Price: {lastFillPrice:.2f}, "
-                                         f"Order ID: {orderId}")
-                        print(f"Trade Executed: {self.position.upper()} - Entry={lastFillPrice}, Order ID={orderId}")
+                if len(self.active_orders) == 1:  # Entry order
+                    trade_logger.info(f"TRADE EXECUTED - Type: {self.position.upper()}, "
+                                     f"Entry Price: {lastFillPrice:.2f}, "
+                                     f"Order ID: {orderId}")
+                    print(f"Trade Executed: {self.position.upper()} - Entry={lastFillPrice}, Order ID={orderId}")
+                    self.entry_price = lastFillPrice  # Update entry price with actual fill price
+                else:  # Exit order
+                    points = lastFillPrice - self.entry_price if self.position == 'long' else self.entry_price - lastFillPrice
+                    trade_result = self.trades[-1]  # Update the last trade result
+                    if self.position == 'long':
+                        trade_result['Long_Result'] = 'SL Hit' if lastFillPrice <= self.sl_price else 'TP Hit'
+                        trade_result['Long_Points'] = points
                     else:
-                        points = lastFillPrice - self.entry_price if self.position == 'long' else self.entry_price - lastFillPrice
-                        trade_result = {
-                            'Date': datetime.now(pytz.timezone('US/Eastern')).date(),
-                            'Long_Result': 'SL Hit' if self.position == 'long' and lastFillPrice <= self.sl_price else 'TP Hit',
-                            'Short_Result': 'SL Hit' if self.position == 'short' and lastFillPrice >= self.sl_price else 'TP Hit',
-                            'Long_Points': points if self.position == 'long' else 0,
-                            'Short_Points': points if self.position == 'short' else 0
-                        }
-                        self.trades.append(trade_result)
-                        trade_logger.info(f"TRADE EXECUTED - Type: {self.position.upper()}, "
-                                         f"Entry Price: {self.entry_price:.2f}, "
-                                         f"Exit Price: {lastFillPrice:.2f}, "
-                                         f"Points: {points:.2f}, "
-                                         f"Order ID: {orderId}")
-                        print(f"Trade Executed: {self.position.upper()} - Entry={self.entry_price}, Exit={lastFillPrice}, Points={points}, Order ID={orderId}")
-                        self.position = None
-                        self.active_orders.clear()
+                        trade_result['Short_Result'] = 'SL Hit' if lastFillPrice >= self.sl_price else 'TP Hit'
+                        trade_result['Short_Points'] = points
+                    trade_logger.info(f"TRADE EXECUTED - Type: {self.position.upper()}, "
+                                     f"Entry Price: {self.entry_price:.2f}, "
+                                     f"Exit Price: {lastFillPrice:.2f}, "
+                                     f"Points: {points:.2f}, "
+                                     f"Order ID: {orderId}")
+                    print(f"Trade Executed: {self.position.upper()} - Entry={self.entry_price}, Exit={lastFillPrice}, Points={points}, Order ID={orderId}")
+                    self.position = None
+                    self.entry_price = None
+                    self.sl_price = None
+                    self.tp_price = None
+                    self.active_orders.clear()
             elif status in ["Cancelled", "Inactive"]:
                 del self.active_orders[orderId]
 
@@ -236,7 +257,7 @@ def main():
         logging.info("Not a trading day. Exiting.")
         return
 
-    logging.info(f"Starting breakout strategy for NASDAQ Futures (NQH5) on {today}")
+    logging.info(f"Starting breakout strategy for NASDAQ Futures (NQM5) on {today}")
     app = BreakoutApp(index_symbol="NQ", opening_time="09:30")
     app.connect("127.0.0.1", 7497, clientId=123)
     api_thread = threading.Thread(target=run_loop, args=(app,), daemon=True)
@@ -248,34 +269,38 @@ def main():
     app.contract.secType = "FUT"
     app.contract.exchange = "CME"
     app.contract.currency = "USD"
-    app.contract.lastTradeDateOrContractMonth = "20250321"
+    app.contract.lastTradeDateOrContractMonth = "20250620"  # June 2025 contract (NQM5)
 
     wait_for_opening_candle(app.opening_time)
 
-    logging.info("Requesting historical data for opening candle...")
     eastern = pytz.timezone('US/Eastern')
     utc = pytz.UTC
-    now_eastern = datetime.now(eastern)
-    target_end = datetime(2025, 3, 20, 9, 45, 0, tzinfo=eastern)
-    end_dt = max(now_eastern, target_end).astimezone(utc)
-    app.reqHistoricalData(
-        reqId=1,
-        contract=app.contract,
-        endDateTime=end_dt.strftime('%Y%m%d %H:%M:%S UTC'),
-        durationStr="3 D",
-        barSizeSetting="15 mins",
-        whatToShow="TRADES",
-        useRTH=0,
-        formatDate=1,
-        keepUpToDate=False,
-        chartOptions=[]
-    )
+    while True:  # Loop until candle is found
+        logging.info("Requesting historical data for opening candle...")
+        now_eastern = datetime.now(eastern)
+        end_dt = now_eastern.astimezone(utc)
+        app.reqHistoricalData(
+            reqId=1,
+            contract=app.contract,
+            endDateTime=end_dt.strftime('%Y%m%d %H:%M:%S UTC'),
+            durationStr="3 D",
+            barSizeSetting="15 mins",
+            whatToShow="TRADES",
+            useRTH=0,
+            formatDate=1,
+            keepUpToDate=False,
+            chartOptions=[]
+        )
 
-    app.data_ready.wait(timeout=15)
-    if not app.opening_candle:
-        logging.error("Failed to get opening candle. Exiting.")
-        app.disconnect()
-        return
+        app.data_ready.wait(timeout=15)
+        if app.opening_candle:
+            logging.info("Opening candle identified. Proceeding with strategy.")
+            break  # Exit loop once candle is found
+        else:
+            logging.warning("Opening candle not found. Retrying in 10 seconds...")
+            app.historical_data = []  # Clear previous data to avoid confusion
+            app.data_ready.clear()    # Reset event for next attempt
+            time.sleep(10)  # Wait before retrying
 
     app.reqMarketDataType(3)  # Delayed data
     app.reqMktData(2, app.contract, "233", False, False, [])
