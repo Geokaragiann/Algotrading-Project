@@ -1,8 +1,5 @@
 # Algotrading-Project
-This is an algorithmic trading project that started in February 10 2025. Work in Progress.
-
-## License  
-This project is licensed under the AGPL-3.0 License. See the [LICENSE](LICENSE) file for details.
+This is an algorithmic trading **group** project that started on February 10 2025. We developed this project to deepen our understanding of API-driven data input and output, backtesting, as well as to practice simplifying complex tasks and delegating them to each team member. AI has been heavily used for this project, testing the limits of what was possible to achieve using the, initially, nonexistent experience on the matter.
 
 ## Disclaimer
 This algorithmic trading project is for research and educational purposes only. It is currently used exclusively on a paper trading account and historical data for testing purposes. It does not constitute financial advice, investment recommendations, or an offer to buy or sell securities.
