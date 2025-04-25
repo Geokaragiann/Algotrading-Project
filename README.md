@@ -1,5 +1,9 @@
 # Algotrading-Project
-This is an algorithmic trading **group** project that started on February 10 2025. We developed this project to deepen our understanding of API-driven data input and output, backtesting, as well as to practice simplifying complex tasks and delegating them to each team member. AI has been heavily used for this project, testing the limits of what was possible to achieve using the, initially, nonexistent experience on the matter.
+This is an algorithmic trading project that started on February 10 2025. 
+
+In collaboration with a team of two, we built this Python script that trades the NASDAQ index based on a predefined strategy. It uses data from IBKR and connects to TWS to execute the trades. 
+
+We developed this project to deepen our understanding of API-driven data input and output, backtesting, as well as to practice simplifying complex tasks and delegating them to each team member. AI has been heavily used for this project, testing the limits of what was possible to achieve using the, initially, nonexistent experience on the matter.
 
 ## Disclaimer
 This algorithmic trading project is for research and educational purposes only. It is currently used exclusively on a paper trading account and historical data for testing purposes. It does not constitute financial advice, investment recommendations, or an offer to buy or sell securities.
