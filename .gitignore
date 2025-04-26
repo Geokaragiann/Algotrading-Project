@@ -3,3 +3,5 @@ __pycache__
 .idea*.lib
 myenv/
 venv/
+trade_execution.log
+breakout_trading.log
